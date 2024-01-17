@@ -57,6 +57,6 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove> bishMoves(ChessBoard board, ChessPosition myPosition) {
-        throw new RuntimeException("Not implemented");
+        return new ArrayList<>();
     }
 }
