@@ -63,6 +63,10 @@ public class ChessPiece {
                 myMoves = bMoves(board, myPosition);
                 break;
 
+            case ROOK:
+                myMoves = rMoves(board, myPosition);
+                break;
+
             default:
                 throw new RuntimeException("Not implemented");
         }
@@ -163,6 +167,91 @@ public class ChessPiece {
         }
 
         return bishopMoves;
+    }
+    private Collection<ChessMove> rMoves(ChessBoard board, ChessPosition myPosition){
+        HashSet<ChessMove> rookMoves = new HashSet<>();
+
+        //UP
+        ChessPosition tempChesspositon = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn());
+        while(true) {
+
+            //Verify if position is invalid
+            if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                break;
+            }
+
+            if (board.getPiece(tempChesspositon) == null) {
+                rookMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow() + 1, tempChesspositon.getColumn());
+            } else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                rookMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                break;
+            } else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                break;
+            }
+        }
+
+        //Right
+        tempChesspositon = new ChessPosition(myPosition.getRow(), myPosition.getColumn() + 1);
+        while(true) {
+
+            //Verify if position is invalid
+            if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                break;
+            }
+
+            if (board.getPiece(tempChesspositon) == null) {
+                rookMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow(), tempChesspositon.getColumn() + 1);
+            } else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                rookMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                break;
+            } else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                break;
+            }
+        }
+
+        //Down
+        tempChesspositon = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn());
+        while(true) {
+
+            //Verify if position is invalid
+            if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                break;
+            }
+
+            if (board.getPiece(tempChesspositon) == null) {
+                rookMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow() - 1, tempChesspositon.getColumn());
+            } else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                rookMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                break;
+            } else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                break;
+            }
+        }
+
+        //Left
+        tempChesspositon = new ChessPosition(myPosition.getRow(), myPosition.getColumn() - 1);
+        while(true) {
+
+            //Verify if position is invalid
+            if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                break;
+            }
+
+            if (board.getPiece(tempChesspositon) == null) {
+                rookMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow(), tempChesspositon.getColumn() - 1);
+            } else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                rookMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                break;
+            } else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                break;
+            }
+        }
+
+        return rookMoves;
     }
 
     private boolean outOfRange(int row, int col){ return row == 9 || row == 0 || col == 0 || col == 9; }
