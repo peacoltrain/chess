@@ -2,6 +2,8 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Objects;
 
 /**
  * Represents a single chess piece
@@ -14,7 +16,7 @@ public class ChessPiece {
     private final ChessGame.TeamColor pieceColor;
     private final PieceType type;
 
-    public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
+    public ChessPiece(ChessGame.TeamColor pieceColor, PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
     }
@@ -54,10 +56,9 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece myPiece = board.getPiece(myPosition);
-        Collection<ChessMove> myMoves = new ArrayList<>();
+        Collection<ChessMove> myMoves;
 
-        switch(myPiece.type) {
+        switch(this.type) {
             case BISHOP:
                 myMoves = bMoves(board, myPosition);
                 break;
@@ -70,40 +71,111 @@ public class ChessPiece {
     }
 
     private Collection<ChessMove> bMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> myArray = new ArrayList<>();
+        HashSet<ChessMove> bishopMoves = new HashSet<>();
 
         //UP-Right
-        int tempRow = myPosition.getRow() + 1;
-        int tempCol = myPosition.getColumn() + 1;
-        while((tempRow != 0) && (tempCol != 0) && (tempRow < 9) && (tempCol < 9)){
-            myArray.add(new ChessMove(myPosition, new ChessPosition(tempRow, tempCol), null));
-            ++tempRow; ++tempCol;
+        ChessPosition tempChesspositon = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
+        while(true) {
+
+            //Verify if position is invalid
+            if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                break;
+            }
+
+            if (board.getPiece(tempChesspositon) == null) {
+                bishopMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow() + 1, tempChesspositon.getColumn() + 1);
+            } else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                bishopMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                break;
+            } else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                break;
+            }
         }
 
         //Down-Right
-        tempRow = myPosition.getRow() - 1;
-        tempCol = myPosition.getColumn() + 1;
-        while((tempRow != 0) && (tempCol != 0) && (tempRow < 9) && (tempCol < 9)){
-            myArray.add(new ChessMove(myPosition, new ChessPosition(tempRow, tempCol), null));
-            --tempRow; ++tempCol;
+        tempChesspositon = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
+        while(true) {
+
+            //Verify if position is invalid
+            if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                break;
+            }
+
+            if(board.getPiece(tempChesspositon) == null) {
+                bishopMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow() - 1, tempChesspositon.getColumn() + 1);
+            }
+            else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                bishopMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                break;
+            }
+            else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                break;
+            }
+
         }
 
         //Down-Left
-        tempRow = myPosition.getRow() - 1;
-        tempCol = myPosition.getColumn() - 1;
-        while((tempRow != 0) && (tempCol != 0) && (tempRow < 9) && (tempCol < 9)){
-            myArray.add(new ChessMove(myPosition, new ChessPosition(tempRow, tempCol), null));
-            --tempRow; --tempCol;
+        tempChesspositon = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
+        while(true) {
+
+            //Verify if position is invalid
+            if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                break;
+            }
+
+            if(board.getPiece(tempChesspositon) == null) {
+                bishopMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow() - 1, tempChesspositon.getColumn() - 1);
+            }
+            else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                bishopMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                break;
+            }
+            else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                break;
+            }
+
         }
 
         //Up-Left
-        tempRow = myPosition.getRow() + 1;
-        tempCol = myPosition.getColumn() - 1;
-        while((tempRow != 0) && (tempCol != 0) && (tempRow < 9) && (tempCol < 9)){
-            myArray.add(new ChessMove(myPosition, new ChessPosition(tempRow, tempCol), null));
-            ++tempRow; --tempCol;
+        tempChesspositon = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
+        while(true) {
+
+            //Verify if position is invalid
+            if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                break;
+            }
+
+            if(board.getPiece(tempChesspositon) == null) {
+                bishopMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow() + 1, tempChesspositon.getColumn() - 1);
+            }
+            else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                bishopMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                break;
+            }
+            else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                break;
+            }
+
         }
 
-        return myArray;
+        return bishopMoves;
+    }
+
+    private boolean outOfRange(int row, int col){ return row == 9 || row == 0 || col == 0 || col == 9; }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ChessPiece that)) return false;
+        return pieceColor == that.pieceColor && type == that.type;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(pieceColor, type);
     }
 }
