@@ -78,12 +78,12 @@ public class TestFactory {
 
     public static ChessBoard loadBoard(String boardText) {
         var board = getNewBoard();
-        int row = 7;  //Incorrect Test? 8 and 1 caused error to be thrown even thou I didnt enter anything.
-        int column = 0;
+        int row = 8;  //Incorrect Test? 8 and 1 caused error to be thrown even thou I didnt enter anything.
+        int column = 1;
         for (var c : boardText.toCharArray()) {
             switch (c) {
                 case '\n' -> {
-                    column = 0;
+                    column = 1;
                     row--;
                 }
                 case ' ' -> column++;

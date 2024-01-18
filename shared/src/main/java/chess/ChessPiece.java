@@ -19,6 +19,7 @@ public class ChessPiece {
         this.type = type;
     }
 
+
     /**
      * The various different chess piece options
      */
@@ -53,10 +54,56 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+        ChessPiece myPiece = board.getPiece(myPosition);
+        Collection<ChessMove> myMoves = new ArrayList<>();
+
+        switch(myPiece.type) {
+            case BISHOP:
+                myMoves = bMoves(board, myPosition);
+                break;
+
+            default:
+                throw new RuntimeException("Not implemented");
+        }
+
+        return myMoves;
     }
 
-    private Collection<ChessMove> bishMoves(ChessBoard board, ChessPosition myPosition) {
-        return new ArrayList<>();
+    private Collection<ChessMove> bMoves(ChessBoard board, ChessPosition myPosition) {
+        Collection<ChessMove> myArray = new ArrayList<>();
+
+        //UP-Right
+        int tempRow = myPosition.getRow() + 1;
+        int tempCol = myPosition.getColumn() + 1;
+        while((tempRow != 0) && (tempCol != 0) && (tempRow < 9) && (tempCol < 9)){
+            myArray.add(new ChessMove(myPosition, new ChessPosition(tempRow, tempCol), null));
+            ++tempRow; ++tempCol;
+        }
+
+        //Down-Right
+        tempRow = myPosition.getRow() - 1;
+        tempCol = myPosition.getColumn() + 1;
+        while((tempRow != 0) && (tempCol != 0) && (tempRow < 9) && (tempCol < 9)){
+            myArray.add(new ChessMove(myPosition, new ChessPosition(tempRow, tempCol), null));
+            --tempRow; ++tempCol;
+        }
+
+        //Down-Left
+        tempRow = myPosition.getRow() - 1;
+        tempCol = myPosition.getColumn() - 1;
+        while((tempRow != 0) && (tempCol != 0) && (tempRow < 9) && (tempCol < 9)){
+            myArray.add(new ChessMove(myPosition, new ChessPosition(tempRow, tempCol), null));
+            --tempRow; --tempCol;
+        }
+
+        //Up-Left
+        tempRow = myPosition.getRow() + 1;
+        tempCol = myPosition.getColumn() - 1;
+        while((tempRow != 0) && (tempCol != 0) && (tempRow < 9) && (tempCol < 9)){
+            myArray.add(new ChessMove(myPosition, new ChessPosition(tempRow, tempCol), null));
+            ++tempRow; --tempCol;
+        }
+
+        return myArray;
     }
 }
