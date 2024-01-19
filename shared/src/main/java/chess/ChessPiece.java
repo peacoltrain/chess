@@ -1,6 +1,6 @@
 package chess;
 
-import java.util.ArrayList;
+//import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -56,28 +56,14 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> myMoves;
-
-        switch(this.type) {
-            case BISHOP:
-                myMoves = bMoves(board, myPosition);
-                break;
-
-            case ROOK:
-                myMoves = rMoves(board, myPosition);
-                break;
-
-            case QUEEN:
-                myMoves = qMoves(board, myPosition);
-                break;
-
-            case KNIGHT:
-                myMoves = kghtMoves(board, myPosition);
-                break;
-
-            default:
-                throw new RuntimeException("Not implemented");
-        }
+        Collection<ChessMove> myMoves = switch (this.type) {
+            case BISHOP -> bMoves(board, myPosition);
+            case ROOK -> rMoves(board, myPosition);
+            case QUEEN -> qMoves(board, myPosition);
+            case KNIGHT -> kightMoves(board, myPosition);
+            case PAWN -> pMoves(board, myPosition);
+            default -> throw new RuntimeException("Not implemented");
+        };
 
         return myMoves;
     }
@@ -434,7 +420,7 @@ public class ChessPiece {
 
         return queenMoves;
     }
-    private Collection<ChessMove> kghtMoves(ChessBoard board, ChessPosition myPosition){
+    private Collection<ChessMove> kightMoves(ChessBoard board, ChessPosition myPosition){
         HashSet<ChessMove> knightMoves = new HashSet<>();
         int[] smallStep = {-1,1};
         int[] largeStep = {-2,2};
@@ -454,9 +440,6 @@ public class ChessPiece {
                     knightMoves.add(new ChessMove(myPosition, tempChesspositon, null));
                 } else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
                     knightMoves.add(new ChessMove(myPosition, tempChesspositon, null));
-                    continue;
-                } else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
-                    continue;
                 }
             }
         }
@@ -477,15 +460,70 @@ public class ChessPiece {
                     knightMoves.add(new ChessMove(myPosition, tempChesspositon, null));
                 } else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
                     knightMoves.add(new ChessMove(myPosition, tempChesspositon, null));
-                    continue;
-                } else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
-                    continue;
                 }
             }
         }
 
 
         return knightMoves;
+    }
+    private Collection<ChessMove> pMoves(ChessBoard board, ChessPosition myPosition) {
+        HashSet<ChessMove> pawnMoves = new HashSet<>();
+        int[] sides = {-1, 1};
+        ChessPiece.PieceType[] upgrades = {PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT, PieceType.QUEEN};
+
+        if(board.getPiece(myPosition).pieceColor == ChessGame.TeamColor.WHITE){
+            ChessPosition tempChesspositon = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn());
+
+            //Check directly foward
+            //Verify if position is valid
+            if (!outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                if (board.getPiece(tempChesspositon) == null) {
+                    if(tempChesspositon.getRow() == 8){
+                        for(var v : upgrades){ pawnMoves.add(new ChessMove(myPosition, tempChesspositon, v)); }
+                    }
+                    else {
+                        pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                    }
+                }
+            }
+
+            if(myPosition.getRow() == 2){
+                tempChesspositon = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
+                if (board.getPiece(tempChesspositon) == null) {
+                    pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                }
+            }
+
+
+        }
+        else{
+            ChessPosition tempChesspositon = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn());
+
+            //Check directly foward
+            //Verify if position is valid
+            if (!outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                if (board.getPiece(tempChesspositon) == null) {
+                    if(tempChesspositon.getRow() == 1){
+                        for(var v : upgrades){ pawnMoves.add(new ChessMove(myPosition, tempChesspositon, v)); }
+                    }
+                    else {
+                        pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                    }
+                }
+            }
+
+            if(myPosition.getRow() == 7){
+                tempChesspositon = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn());
+                if (board.getPiece(tempChesspositon) == null) {
+                    pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                }
+            }
+        }
+
+
+
+        return pawnMoves;
     }
 
     private boolean outOfRange(int row, int col){ return row >= 9 || row <= 0 || col <= 0 || col >= 9; }
