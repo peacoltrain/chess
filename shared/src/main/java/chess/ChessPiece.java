@@ -62,6 +62,7 @@ public class ChessPiece {
             case QUEEN -> qMoves(board, myPosition);
             case KNIGHT -> kightMoves(board, myPosition);
             case PAWN -> pMoves(board, myPosition);
+            case KING -> kingMoves(board, myPosition);
             default -> throw new RuntimeException("Not implemented");
         };
 
@@ -525,6 +526,22 @@ public class ChessPiece {
 
 
         return pawnMoves;
+    }
+    private Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
+        HashSet<ChessMove> kingMoves = new HashSet<>();
+        int[] smallRow = {-1, 0, 1};
+
+        for(var i : smallRow){
+            for(var j : smallRow) {
+                if(i == 0 && j == 0){ continue; }
+                ChessPosition tempChesspositon = new ChessPosition(myPosition.getRow() + i, myPosition.getColumn() + j);
+                if((!outOfRange(tempChesspositon.getRow(), tempChesspositon.getColumn()) && (board.getPiece(tempChesspositon) == null || (board.getPiece(tempChesspositon) != null && pieceColor != board.getPiece(tempChesspositon).pieceColor)))) {
+                    kingMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                }
+            }
+        }
+
+        return kingMoves;
     }
 
     private boolean outOfRange(int row, int col){ return row >= 9 || row <= 0 || col <= 0 || col >= 9; }
