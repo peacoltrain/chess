@@ -71,6 +71,10 @@ public class ChessPiece {
                 myMoves = qMoves(board, myPosition);
                 break;
 
+            case KNIGHT:
+                myMoves = kghtMoves(board, myPosition);
+                break;
+
             default:
                 throw new RuntimeException("Not implemented");
         }
@@ -430,8 +434,61 @@ public class ChessPiece {
 
         return queenMoves;
     }
+    private Collection<ChessMove> kghtMoves(ChessBoard board, ChessPosition myPosition){
+        HashSet<ChessMove> knightMoves = new HashSet<>();
+        int[] smallStep = {-1,1};
+        int[] largeStep = {-2,2};
 
-    private boolean outOfRange(int row, int col){ return row == 9 || row == 0 || col == 0 || col == 9; }
+        //Vertical
+        for(int l : largeStep) {
+            ChessPosition tempChesspositon = new ChessPosition(myPosition.getRow() + l, myPosition.getColumn());
+            for (int s : smallStep) {
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow(), myPosition.getColumn() + s);
+
+                //Verify if position is valid
+                if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                    continue;
+                }
+
+                if (board.getPiece(tempChesspositon) == null) {
+                    knightMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                } else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                    knightMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                    continue;
+                } else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                    continue;
+                }
+            }
+        }
+
+
+        //Horizontal
+        for(int l : largeStep) {
+            ChessPosition tempChesspositon = new ChessPosition(myPosition.getRow(), myPosition.getColumn() + l);
+            for (int s : smallStep) {
+                tempChesspositon = new ChessPosition(myPosition.getRow() + s, tempChesspositon.getColumn());
+
+                //Verify if position is valid
+                if (outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
+                    continue;
+                }
+
+                if (board.getPiece(tempChesspositon) == null) {
+                    knightMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                } else if (board.getPiece(tempChesspositon).pieceColor != board.getPiece(myPosition).pieceColor) {
+                    knightMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                    continue;
+                } else if (board.getPiece(tempChesspositon).pieceColor == board.getPiece(myPosition).pieceColor) {
+                    continue;
+                }
+            }
+        }
+
+
+        return knightMoves;
+    }
+
+    private boolean outOfRange(int row, int col){ return row >= 9 || row <= 0 || col <= 0 || col >= 9; }
 
     @Override
     public boolean equals(Object o) {
