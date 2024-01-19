@@ -469,64 +469,70 @@ public class ChessPiece {
     }
     private Collection<ChessMove> pMoves(ChessBoard board, ChessPosition myPosition) {
         HashSet<ChessMove> pawnMoves = new HashSet<>();
-        int[] sides = {-1, 1};
+        int[] sides = {-1, 0, 1};
         ChessPiece.PieceType[] upgrades = {PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT, PieceType.QUEEN};
 
         if(board.getPiece(myPosition).pieceColor == ChessGame.TeamColor.WHITE){
             ChessPosition tempChesspositon = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn());
 
-            //Check directly foward
-            //Verify if position is valid
-            if (!outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
-                if (board.getPiece(tempChesspositon) == null) {
-                    if(tempChesspositon.getRow() == 8){
-                        for(var v : upgrades){ pawnMoves.add(new ChessMove(myPosition, tempChesspositon, v)); }
-                    }
-                    else {
-                        pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+            for(var s : sides) {
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow(), myPosition.getColumn() + s);
+                if (!outOfRange(tempChesspositon.getRow(), tempChesspositon.getColumn())) {
+                    boolean goSide = sidePath(s, board.getPiece(tempChesspositon));
+                    if ((board.getPiece(tempChesspositon) == null && s == 0) || goSide) {
+                        if (tempChesspositon.getRow() == 8) {
+                            for (var u : upgrades) {
+                                pawnMoves.add(new ChessMove(myPosition, tempChesspositon, u));
+                            }
+                        } else {
+                            pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                            if(myPosition.getRow() == 2){
+                                tempChesspositon = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
+                                if (board.getPiece(tempChesspositon) == null) {
+                                    pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                                }
+                            }
+                        }
                     }
                 }
             }
-
-            if(myPosition.getRow() == 2){
-                tempChesspositon = new ChessPosition(myPosition.getRow() + 2, myPosition.getColumn());
-                if (board.getPiece(tempChesspositon) == null) {
-                    pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
-                }
-            }
-
-
         }
         else{
             ChessPosition tempChesspositon = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn());
 
-            //Check directly foward
-            //Verify if position is valid
-            if (!outOfRange((tempChesspositon.getRow()), tempChesspositon.getColumn())) {
-                if (board.getPiece(tempChesspositon) == null) {
-                    if(tempChesspositon.getRow() == 1){
-                        for(var v : upgrades){ pawnMoves.add(new ChessMove(myPosition, tempChesspositon, v)); }
+            for(var s : sides) {
+                tempChesspositon = new ChessPosition(tempChesspositon.getRow(), myPosition.getColumn() + s);
+                if (!outOfRange(tempChesspositon.getRow(), tempChesspositon.getColumn())) {
+                    boolean goSide = sidePath(s, board.getPiece(tempChesspositon));
+                    if ((board.getPiece(tempChesspositon) == null && s == 0) || goSide) {
+                        if (tempChesspositon.getRow() == 1) {
+                            for (var u : upgrades) {
+                                pawnMoves.add(new ChessMove(myPosition, tempChesspositon, u));
+                            }
+                        } else {
+                            pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                            if(myPosition.getRow() == 7){
+                                tempChesspositon = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn());
+                                if (board.getPiece(tempChesspositon) == null) {
+                                    pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
+                                }
+                            }
+                        }
                     }
-                    else {
-                        pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
-                    }
-                }
-            }
-
-            if(myPosition.getRow() == 7){
-                tempChesspositon = new ChessPosition(myPosition.getRow() - 2, myPosition.getColumn());
-                if (board.getPiece(tempChesspositon) == null) {
-                    pawnMoves.add(new ChessMove(myPosition, tempChesspositon, null));
                 }
             }
         }
-
 
 
         return pawnMoves;
     }
 
     private boolean outOfRange(int row, int col){ return row >= 9 || row <= 0 || col <= 0 || col >= 9; }
+
+    private boolean sidePath(int s, ChessPiece myPiece){
+        if(myPiece == null || s == 0){ return false; }
+        return myPiece.pieceColor != pieceColor;
+    }
 
     @Override
     public boolean equals(Object o) {
