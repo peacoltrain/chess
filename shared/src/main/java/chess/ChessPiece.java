@@ -56,17 +56,15 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        Collection<ChessMove> myMoves = switch (this.type) {
+
+        return switch (this.type) {
             case BISHOP -> bMoves(board, myPosition);
             case ROOK -> rMoves(board, myPosition);
             case QUEEN -> qMoves(board, myPosition);
             case KNIGHT -> kightMoves(board, myPosition);
             case PAWN -> pMoves(board, myPosition);
             case KING -> kingMoves(board, myPosition);
-            default -> throw new RuntimeException("Not implemented");
         };
-
-        return myMoves;
     }
 
     private Collection<ChessMove> bMoves(ChessBoard board, ChessPosition myPosition) {
