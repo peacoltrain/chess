@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -14,7 +15,7 @@ public class ChessGame {
     private ChessBoard myCurrentBoard;
 
     public ChessGame() {
-
+        this.teamTurn = TeamColor.WHITE;
     }
 
     /**
@@ -91,8 +92,34 @@ public class ChessGame {
      * @param teamColor which team to check for check
      * @return True if the specified team is in check
      */
-    public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+    public boolean isInCheck(TeamColor teamColor){
+        ChessPosition kingPosition = null;
+        Collection<ChessMove> allOppTeamMoves = new HashSet<>();
+        for(int i = 1; i < 9; ++i){
+            for(int j = 1; j < 9; ++j){
+                ChessPosition tmpPos = new ChessPosition(i,j);
+                if(myCurrentBoard.getPiece(tmpPos) != null) {
+
+                    //Identify the color king
+                    if (myCurrentBoard.getPiece(tmpPos).getPieceType() == ChessPiece.PieceType.KING && myCurrentBoard.getPiece(tmpPos).getTeamColor() == teamColor) {
+                        kingPosition = tmpPos;
+                    }
+
+                    //Get all the possible moves of the other team.
+                    if (myCurrentBoard.getPiece(tmpPos).getTeamColor() != teamColor) {
+                        allOppTeamMoves.addAll(myCurrentBoard.getPiece(tmpPos).pieceMoves(myCurrentBoard, tmpPos));
+                    }
+                }
+            }
+        }
+
+        for(ChessMove m : allOppTeamMoves){
+            if(m.endPosition.getColumn() == kingPosition.getColumn() && m.endPosition.getRow() == kingPosition.getRow()){
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
