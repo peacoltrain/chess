@@ -80,6 +80,9 @@ public class ChessGame {
                 this.teamTurn = TeamColor.WHITE;
             }
         }
+        else{
+            throw new InvalidMoveException();
+        }
     }
 
     /**
