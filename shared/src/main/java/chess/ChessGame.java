@@ -84,8 +84,17 @@ public class ChessGame {
         Collection<ChessMove> valMoves = validMoves(move.startPosition);
 
         if(valMoves.contains(move)){
-            myCurrentBoard.addPiece(move.endPosition, myCurrentBoard.getPiece(move.startPosition));
-            myCurrentBoard.addPiece(move.startPosition, null);
+
+            if(move.promotionPiece != null){
+                myCurrentBoard.addPiece(move.endPosition, new ChessPiece(ourPieceColor, move.promotionPiece));
+                myCurrentBoard.addPiece(move.startPosition, null);
+            }
+            else{
+                myCurrentBoard.addPiece(move.endPosition, myCurrentBoard.getPiece(move.startPosition));
+                myCurrentBoard.addPiece(move.startPosition, null);
+            }
+
+            //Switch Teams
             if(this.teamTurn == TeamColor.WHITE){
                 this.teamTurn = TeamColor.BLACK;
             }
@@ -93,6 +102,7 @@ public class ChessGame {
                 this.teamTurn = TeamColor.WHITE;
             }
         }
+
         else{
             throw new InvalidMoveException();
         }
