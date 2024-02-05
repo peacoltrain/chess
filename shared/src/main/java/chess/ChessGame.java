@@ -51,17 +51,18 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         Collection<ChessMove> potentialMoves = myCurrentBoard.getPiece(startPosition).pieceMoves(myCurrentBoard, startPosition);
+        Collection<ChessMove> validMoves = new HashSet<ChessMove>();
         ChessBoard prevBoard = new ChessBoard(myCurrentBoard);
         for(ChessMove m : potentialMoves){
             myCurrentBoard.addPiece(m.endPosition, myCurrentBoard.getPiece(m.startPosition));
             myCurrentBoard.addPiece(m.startPosition, null);
-            if(isInCheck(teamTurn)){
-               potentialMoves.remove(m);
+            if(!isInCheck(teamTurn)){
+               validMoves.add(m);
             }
             myCurrentBoard = new ChessBoard(prevBoard);
         }
 
-        return potentialMoves;
+        return validMoves;
     }
 
     /**
