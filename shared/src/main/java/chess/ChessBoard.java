@@ -81,4 +81,16 @@ public class ChessBoard {
     public int hashCode() {
         return Arrays.deepHashCode(pieceMatrix);
     }
+
+    public ChessBoard(ChessBoard other) {
+        this.pieceMatrix = new ChessPiece[8][8];
+
+        for(int i = 0; i < 8; ++i){
+            for(int j = 0; j < 8; ++j){
+                if (other.pieceMatrix[i][j] != null) {
+                    this.pieceMatrix[i][j] = other.pieceMatrix[i][j];
+                }
+            }
+        }
+    }
 }
