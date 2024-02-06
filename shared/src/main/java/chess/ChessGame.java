@@ -184,7 +184,25 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        return false; //TODO, fix Stalemate
+        if(isInCheck(teamColor)){
+            return false;
+        }
+
+        //Get any moves that result in me moving but not into check
+        Collection<ChessMove> myMoves = new HashSet<>();
+        for(int i = 1; i < 9; ++i){
+            for(int j = 1; j < 9; ++j) {
+                ChessPosition tmpPos = new ChessPosition(i,j);
+                if(myCurrentBoard.getPiece(tmpPos) != null){
+                    if(myCurrentBoard.getPiece(tmpPos).getTeamColor() == teamColor){
+                        myMoves.addAll(validMoves(tmpPos));
+                    }
+                }
+            }
+        }
+
+        return myMoves.isEmpty();
+
     }
 
     /**
