@@ -118,8 +118,8 @@ public class ChessGame {
         ChessPosition kingPosition = null;
         Collection<ChessMove> allOppTeamMoves = new HashSet<>();
 
-        for(int i = 1; i < 9; ++i){
-            for(int j = 1; j < 9; ++j){
+        for(int i = 1; i < 9; ++i) {
+            for(int j = 1; j < 9; ++j) {
                 ChessPosition tmpPos = new ChessPosition(i,j);
                 if(myCurrentBoard.getPiece(tmpPos) != null) {
                     //Identify the color king
@@ -154,7 +154,26 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        return false; //TODO, fix is in Checkmate
+        if(!isInCheck(teamColor)){
+            return false;
+        }
+
+        //Get any moves that result in me no longer being in check
+        Collection<ChessMove> myMoves = new HashSet<>();
+        for(int i = 1; i < 9; ++i){
+            for(int j = 1; j < 9; ++j) {
+                ChessPosition tmpPos = new ChessPosition(i,j);
+                if(myCurrentBoard.getPiece(tmpPos) != null){
+                    if(myCurrentBoard.getPiece(tmpPos).getTeamColor() == teamColor){
+                        myMoves.addAll(validMoves(tmpPos));
+                    }
+                }
+            }
+        }
+
+        //If there are no moves in the set return true, else false
+        return myMoves.isEmpty();
+
     }
 
     /**
