@@ -56,7 +56,7 @@ public class ChessGame {
         for(ChessMove m : potentialMoves){
             myCurrentBoard.addPiece(m.endPosition, myCurrentBoard.getPiece(m.startPosition));
             myCurrentBoard.addPiece(m.startPosition, null);
-            if(!isInCheck(teamTurn)){
+            if(!isInCheck(myCurrentBoard.getPiece(m.endPosition).getTeamColor())){
                validMoves.add(m);
             }
             myCurrentBoard = new ChessBoard(prevBoard);
