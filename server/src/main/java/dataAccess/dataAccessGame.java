@@ -1,9 +1,6 @@
 package dataAccess;
-
 import chess.ChessGame;
-import model.AuthData;
 import model.GameData;
-
 import java.nio.file.DirectoryNotEmptyException;
 import java.util.Random;
 import java.util.*;
