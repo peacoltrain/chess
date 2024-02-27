@@ -1,19 +1,16 @@
 package service;
-
 import dataAccess.DataAccessException;
 import dataAccess.dataAccessAuth;
 import dataAccess.dataAccessUser;
 import model.AuthData;
 import model.UserData;
-
 import java.util.UUID;
 
 public class UserService {
 
     public static AuthData register(UserData user) throws DataAccessException {
-        UserData exists = null;
         try {
-            exists = dataAccessUser.getUser(user);
+            dataAccessUser.getUser(user);
         } catch (DataAccessException e) {
             dataAccessUser.addUser(user);
             dataAccessAuth.addAuth(new AuthData(user.username(), UUID.randomUUID().toString()));

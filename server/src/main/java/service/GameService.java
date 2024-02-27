@@ -5,26 +5,18 @@ import dataAccess.dataAccessAuth;
 import dataAccess.dataAccessGame;
 import model.AuthData;
 import model.GameData;
-
-import java.nio.file.DirectoryNotEmptyException;
 import java.util.Collection;
 
 public class GameService {
 
     public static Collection<GameData> GameListService(String authToken) throws DataAccessException {
-        var exists = dataAccessAuth.getAuthFromToken(authToken);
-        if(exists != null) {
-            return dataAccessGame.getGameList();
-        }
-        throw new DataAccessException("Error: unauthorized");
+        dataAccessAuth.getAuthFromToken(authToken);
+        return dataAccessGame.getGameList();
     }
 
     public static GameData CreateService(String authToken, GameData gameData) throws DataAccessException {
-        var exists = dataAccessAuth.getAuthFromToken(authToken);
-        if(exists != null) {
-            return dataAccessGame.createNewGame(gameData.gameName);
-        }
-        throw new DataAccessException("Error: unauthorized");
+        dataAccessAuth.getAuthFromToken(authToken);
+        return dataAccessGame.createNewGame(gameData.gameName);
     }
 
     public static void JoinService(String authToken, String color, int gameID) throws DataAccessException {
