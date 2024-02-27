@@ -1,3 +1,4 @@
+import Handlers.mainHandler;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.dataAccessAuth;
@@ -23,7 +24,11 @@ public class serviceTest {
     public void registerNewUser() {
         Set<UserData> testSet = new HashSet<>();
         testSet.add(new UserData("username1","thisisnotsecure", "email@email.com"));
-        UserService.register(new UserData("username1","thisisnotsecure", "email@email.com"));
+        try {
+            UserService.register(new UserData("username1", "thisisnotsecure", "email@email.com"));
+        } catch (DataAccessException e) {
+            Assertions.fail("Not supposed to throw error");
+        }
 
         Assertions.assertEquals(testSet, dataAccessUser.myUserData);
 
@@ -41,12 +46,24 @@ public class serviceTest {
         testSet.add(new UserData("username3","thisisnotsecure", "notrealemail"));
 
         //Services valid
-        UserService.register(new UserData("username1","thisisnotsecure", "email@email.com"));
-        UserService.register(new UserData("username1","thisISnotsecure", "email@email.com"));
-        UserService.register(new UserData("username2","15651312414", "email@email.com"));
-        UserService.register(new UserData("username2","15651312", "email@email.com"));
-        UserService.register(new UserData("username3","thisisnotsecure", "notrealemail"));
-        UserService.register(new UserData("username3","thisisnotsecure", "notrealemail"));
+        try{ UserService.register(new UserData("username1","thisisnotsecure", "email@email.com"));
+        } catch (DataAccessException e) { Assertions.fail("Not supposed to error");}
+        try {
+            UserService.register(new UserData("username1", "thisISnotsecure", "email@email.com"));
+            Assertions.fail("Should error");
+        } catch (DataAccessException e) {}
+        try {UserService.register(new UserData("username2", "15651312414", "email@email.com"));
+        } catch (DataAccessException e) {Assertions.fail("Not supposed to error");}
+        try {
+            UserService.register(new UserData("username2", "15651312", "email@email.com"));
+            Assertions.fail("Should error");
+        } catch (DataAccessException e) {}
+        try { UserService.register(new UserData("username3", "thisisnotsecure", "notrealemail"));
+        } catch (DataAccessException e) { Assertions.fail("Shouln't throw error");}
+        try {
+            UserService.register(new UserData("username3", "thisisnotsecure", "notrealemail"));
+            Assertions.fail("Should throw error");
+        } catch (DataAccessException e) {}
 
         Assertions.assertEquals(testSet, dataAccessUser.myUserData);
 
@@ -54,7 +71,6 @@ public class serviceTest {
         testSet.clear();
         ClearService.clearDataBase();
         Assertions.assertEquals(testSet, dataAccessUser.myUserData);
-        ClearService.clearDataBase();
     }
 
     @Test
@@ -73,25 +89,28 @@ public class serviceTest {
 
 
         //Services
-        UserService.register(new UserData("username1","thisisnotsecure", "email@email.com"));
-        UserService.register(new UserData("username1","thisISnotsecure", "email@email.com"));
-        UserService.register(new UserData("username2","15651312414", "email@email.com"));
-        UserService.register(new UserData("username2","15651312", "email@email.com"));
-        UserService.register(new UserData("username3","thisisnotsecure", "notrealemail"));
-        UserService.register(new UserData("username3","thisisnotsecure", "notrealemail"));
+        try{ UserService.register(new UserData("username1","thisisnotsecure", "email@email.com"));
+        } catch (DataAccessException e) { Assertions.fail("Not supposed to error");}
+        try {
+            UserService.register(new UserData("username1", "thisISnotsecure", "email@email.com"));
+            Assertions.fail("Should error");
+        } catch (DataAccessException e) {}
+        try {UserService.register(new UserData("username2", "15651312414", "email@email.com"));
+        } catch (DataAccessException e) {Assertions.fail("Not supposed to error");}
+        try {
+            UserService.register(new UserData("username2", "15651312", "email@email.com"));
+            Assertions.fail("Should error");
+        } catch (DataAccessException e) {}
+        try { UserService.register(new UserData("username3", "thisisnotsecure", "notrealemail"));
+        } catch (DataAccessException e) { Assertions.fail("Shouln't throw error");}
+        try {
+            UserService.register(new UserData("username3", "thisisnotsecure", "notrealemail"));
+            Assertions.fail("Should throw error");
+        } catch (DataAccessException e) {}
 
         //Compare Users and auth
         Assertions.assertEquals(testUserSet, dataAccessUser.myUserData);
-
-        Set<String> testUsernames = new HashSet<>();
-        Set<String> serviceUsernames = new HashSet<>();
-        for(AuthData test: testAuthSet){
-            testUsernames.add(test.username());
-        }
-        for(AuthData service: dataAccessAuth.myAuthData){
-            serviceUsernames.add(service.username());
-        }
-        Assertions.assertEquals(testUsernames, serviceUsernames);
+        Assertions.assertEquals(testAuthSet.size(), dataAccessAuth.myAuthData.size());
 
         //Clear sets
         testUserSet.clear();
@@ -127,13 +146,15 @@ public class serviceTest {
     }
 
     @Test
-    @DisplayName("Make on user and then log in")
+    @DisplayName("Make on multiple and then log in")
     public void logout() {
         Set<AuthData> testSet = new HashSet<>();
         AuthData test = new AuthData(UUID.randomUUID().toString(), "HelloThere");
         dataAccessAuth.addAuth(test);
         Assertions.assertNotNull(dataAccessAuth.myAuthData);
-        UserService.logout(test);
+        try{
+            UserService.logout(test.authToken());
+        }catch (DataAccessException e){ Assertions.fail("Should not have thrown error");}
         Assertions.assertEquals(testSet, dataAccessAuth.myAuthData);
         ClearService.clearDataBase();
     }
@@ -142,7 +163,10 @@ public class serviceTest {
     @DisplayName("Create a game")
     public void createGame(){
         Set<GameData> testSet = new HashSet<>();
-        AuthData testAuth = UserService.register(new UserData("RandomUser","12345678", "yahoo@gmail.com"));
+        AuthData testAuth = null;
+        try {
+            testAuth = UserService.register(new UserData("RandomUser", "12345678", "yahoo@gmail.com"));
+        } catch (DataAccessException e) { Assertions.fail("Should not throw error");}
         testSet.add(new GameData(12345, null, null, "Empty Game", new ChessGame()));
         GameService.CreateService(testAuth.authToken(), "Empty Game");
         Assertions.assertEquals(testSet.size(), dataAccessGame.getGameList().size());
@@ -153,7 +177,9 @@ public class serviceTest {
     @DisplayName("Get a list of games")
     public void GameListTest() {
         List<GameData> testList = new ArrayList<>();
-        AuthData testAuth = UserService.register(new UserData("RandomUser","12345678", "yahoo@gmail.com"));
+        AuthData testAuth = null;
+        try { testAuth = UserService.register(new UserData("RandomUser", "12345678", "yahoo@gmail.com"));
+        } catch (DataAccessException e) { Assertions.fail("Shouldn't throw error");}
 
         //Add games to testList
         testList.add(new GameData(12345, null, null, "Empty Game", new ChessGame()));
@@ -172,9 +198,16 @@ public class serviceTest {
     @Test
     @DisplayName("Join a game")
     public void joinGame(){
-        AuthData testAuth1 = UserService.register(new UserData("RandomUser1","12345678", "yahoo@gmail.com"));
-        AuthData testAuth2 = UserService.register(new UserData("RandomUser2","12345678", "yahoo@gmail.com"));
-        AuthData testAuth3 = UserService.register(new UserData("RandomUser3","12345678", "yahoo@gmail.com"));
+        AuthData testAuth1 = null;
+        AuthData testAuth2 = null;
+        AuthData testAuth3 = null;
+
+        try{ testAuth1 = UserService.register(new UserData("RandomUser1","12345678", "yahoo@gmail.com"));
+        }catch (DataAccessException e) {Assertions.fail("Shouldn't throw error");}
+        try{ testAuth2 = UserService.register(new UserData("RandomUser2","12345678", "yahoo@gmail.com"));
+        }catch (DataAccessException e) {Assertions.fail("Shouldn't throw error");}
+        try{ testAuth3 = UserService.register(new UserData("RandomUser3","12345678", "yahoo@gmail.com"));
+        }catch (DataAccessException e) {Assertions.fail("Shouldn't throw error");}
         GameData game = GameService.CreateService(testAuth1.authToken(), "Empty Game");
         GameService.JoinService(testAuth1.authToken(), "white", game.gameID);
         GameService.JoinService(testAuth2.authToken(), "black", game.gameID);

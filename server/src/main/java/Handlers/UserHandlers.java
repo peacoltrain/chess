@@ -11,15 +11,29 @@ import spark.Request;
 import spark.Response;
 
 public class UserHandlers {
+
+    private static Gson gson = new Gson();
+    private static JsonObject jsonObject = new JsonObject();
     public static String register(Request request, Response response){
-        Gson gson = new Gson();
-        ClearService.clearDataBase();
-        response.status(200);
-        return "";
+        UserData registerData = gson.fromJson(request.body(),UserData.class);
+        if(registerData.username() == null || registerData.password() == null){
+            response.status(400);
+            jsonObject.addProperty("message", "Error: bad request");
+            return gson.toJson(jsonObject);
+        }
+        try{
+            AuthData returnData = UserService.register(registerData);
+            return gson.toJson(returnData);
+        } catch (DataAccessException e) {
+            response.status(403);
+            String message = e.getMessage();
+            jsonObject.addProperty("message", message);
+            return gson.toJson(jsonObject);
+        }
+
     }
 
     public static String login(Request request, Response response){
-        Gson gson = new Gson();
         UserData loginData = gson.fromJson(request.body(), UserData.class);
         try{
             AuthData returnData = UserService.login(loginData);
@@ -27,17 +41,22 @@ public class UserHandlers {
         } catch(DataAccessException e){
             response.status(401);
             String message = e.getMessage();
-            JsonObject jsonObject = new JsonObject();
             jsonObject.addProperty("message", message);
             return gson.toJson(jsonObject);
         }
     }
 
     public static String logout(Request request, Response response){
-        Gson gson = new Gson();
-        ClearService.clearDataBase();
-        response.status(200);
-        return "";
+        String authToken = request.headers("authorization");
+        try {
+            UserService.logout(authToken);
+            return "";
+        } catch (DataAccessException e) {
+            response.status(401);
+            String message = e.getMessage();
+            jsonObject.addProperty("message", message);
+            return gson.toJson(jsonObject);
+        }
     }
 
 }

@@ -41,8 +41,14 @@ public class dataAccessAuth {
         return null;
     }
 
-    public static void deleteAuth(AuthData token){
-        myAuthData.remove(token);
+    public static void deleteAuth(String token) throws DataAccessException {
+        for (AuthData a : myAuthData){
+            if(a.authToken().equals(token)){
+                myAuthData.remove(a);
+                return;
+            }
+        }
+        throw new DataAccessException("Error: unauthorized");
     }
 
 
