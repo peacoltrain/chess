@@ -90,9 +90,9 @@ public class mainHandler {
 
         //Get authToken, gameID, and playerColor
         String authToken = request.headers("authorization");
-        int gameID = jsonObject.get("gameID").getAsInt();
         String playerColor = null;
         jsonObject = JsonParser.parseString(request.body()).getAsJsonObject();
+        int gameID = jsonObject.get("gameID").getAsInt();
         if(jsonObject.has("playerColor")){
             playerColor = jsonObject.get("playerColor").getAsString();
         }
