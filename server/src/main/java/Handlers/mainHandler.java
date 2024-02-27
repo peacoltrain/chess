@@ -8,31 +8,37 @@ import dataAccess.DataAccessException;
 import model.GameData;
 import service.ClearService;
 import service.GameService;
-import service.UserService;
 import spark.Request;
 import spark.Response;
 
 import java.util.Collection;
 
 public class mainHandler {
-    static Gson gson = new Gson();
 
     public static String clear(Request request, Response response){
+        //Call ClearService
         ClearService.clearDataBase();
+
+        //Set response status
         response.status(200);
         return "";
     }
 
     public static String list(Request request, Response response){
+        //Create new JsonObject and gson
         JsonObject jsonObject = new JsonObject();
+        Gson gson = new Gson();
+
+        //get authToken
         String authToken = request.headers("authorization");
+
+        //Try to get list of gameData
         try {
+            //Call Service
             Collection<GameData> returnData = GameService.GameListService(authToken);
 
-            // Create a JsonArray to store game objects
+            //Declare JsonArray and make Json for every needed element
             JsonArray gamesArray = new JsonArray();
-
-            // Iterate over each GameData object and extract desired fields
             for (GameData game : returnData) {
                 JsonObject gameJson = new JsonObject();
                 gameJson.addProperty("gameID", game.gameID);
@@ -42,14 +48,11 @@ public class mainHandler {
                 gamesArray.add(gameJson);
             }
 
-            // Add the gamesArray to the jsonResponse object
+            // Add the array of json to jsonObject
             jsonObject.add("games", gamesArray);
-
-            // Convert the jsonResponse object to a JSON string and return it
             return gson.toJson(jsonObject);
-
-
-        } catch (DataAccessException e ){
+        } catch (DataAccessException e ) {
+            //In the event an Exception is thrown
             response.status(401);
             String message = e.getMessage();
             jsonObject.addProperty("message", message);
@@ -58,15 +61,21 @@ public class mainHandler {
     }
 
     public static String create(Request request, Response response){
+        //Create new JsonObject and gson
         JsonObject jsonObject = new JsonObject();
+        Gson gson = new Gson();
+
+        //Get authToken and make a GameData instance with necessary info
         String authToken = request.headers("authorization");
         GameData gameData = gson.fromJson(request.body(), GameData.class);
 
         try {
+            //Try to create game
             GameData returnData = GameService.CreateService(authToken, gameData);
             jsonObject.addProperty("gameID", returnData.gameID);
             return gson.toJson(jsonObject);
         } catch (DataAccessException e) {
+            //In the event an Exception is thrown
             response.status(401);
             String message = e.getMessage();
             jsonObject.addProperty("message", message);
@@ -75,16 +84,25 @@ public class mainHandler {
     }
 
     public static String join(Request request, Response response){
+        //Create new JsonObject and gson
+        JsonObject jsonObject = new JsonObject();
+        Gson gson = new Gson();
+
+        //Get authToken, gameID, and playerColor
         String authToken = request.headers("authorization");
+        int gameID = jsonObject.get("gameID").getAsInt();
         String playerColor = null;
-        JsonObject jsonObject = JsonParser.parseString(request.body()).getAsJsonObject();
+        jsonObject = JsonParser.parseString(request.body()).getAsJsonObject();
         if(jsonObject.has("playerColor")){
             playerColor = jsonObject.get("playerColor").getAsString();
         }
+
         try {
-            GameService.JoinService(authToken, playerColor, jsonObject.get("gameID").getAsInt());
+            GameService.JoinService(authToken, playerColor, gameID);
             return "";
         } catch (DataAccessException e) {
+            /*In the event an Exception is thrown, first get the message
+            then set the corresponding status. Return Json*/
             String message = e.getMessage();
             switch (message) {
                 case "Error: bad request" -> response.status(400);
