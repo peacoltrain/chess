@@ -220,11 +220,17 @@ public class serviceTest {
         try{
             game = GameService.CreateService(testAuth1.authToken(), new GameData(1234, null,null, "Empty", new ChessGame()));
         } catch (DataAccessException e) {Assertions.fail("Should not throw");}
-        GameService.JoinService(testAuth1.authToken(), "white", game.gameID);
-        GameService.JoinService(testAuth2.authToken(), "black", game.gameID);
-        GameService.JoinService(testAuth3.authToken(), null, game.gameID);
-        Assertions.assertNotNull(game.getBlackUsername());
-        Assertions.assertNotNull(game.getWhiteUsername());
+        try {
+            GameService.JoinService(testAuth1.authToken(), "white", game.gameID);
+        } catch (DataAccessException e){Assertions.fail("Should not throw");}
+        try{
+            GameService.JoinService(testAuth2.authToken(), "black", game.gameID);
+        } catch (DataAccessException e){Assertions.fail("Should not throw");}
+        try{
+            GameService.JoinService(testAuth3.authToken(), null, game.gameID);
+        } catch (DataAccessException e){Assertions.fail("Should not throw");}
+        Assertions.assertEquals(testAuth1.username(), game.whiteUsername);
+        Assertions.assertEquals(testAuth2.username(), game.blackUsername);
         ClearService.clearDataBase();
     }
 }

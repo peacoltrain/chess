@@ -30,22 +30,9 @@ public class GameService {
     public static void JoinService(String authToken, String color, int gameID) throws DataAccessException {
         AuthData authData = dataAccessAuth.getAuthFromToken(authToken); //Throws exception if authToken doesn't exist
         GameData selectedGame = dataAccessGame.getGameFromID(gameID); //Throws exception if gameID doesn't exist
-            if(color != null){
-                if(color.equals("white")){
-                    try{
-                        selectedGame.setWhiteUsername(authData.username());
-                    } catch (DirectoryNotEmptyException e) {
-                        throw new DataAccessException(e.getMessage());
-                    }
-                }
-                else{
-                    try{
-                        selectedGame.setBlackUsername(authData.username());
-                    } catch (DirectoryNotEmptyException e) {
-                        throw new DataAccessException(e.getMessage());
-                    }
-                }
-            }
+        if(color != null){
+            dataAccessGame.addPlayer(selectedGame, authData.username(), color);
+        }
     }
 
 }

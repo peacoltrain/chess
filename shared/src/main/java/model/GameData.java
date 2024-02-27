@@ -8,8 +8,8 @@ import java.util.zip.DataFormatException;
 public class GameData {
 
     public final int gameID;
-    String whiteUsername;
-    String blackUsername;
+    public String whiteUsername;
+    public String blackUsername;
     public final String gameName;
     public final chess.ChessGame game;
 

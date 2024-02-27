@@ -3,6 +3,8 @@ package dataAccess;
 import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
+
+import java.nio.file.DirectoryNotEmptyException;
 import java.util.Random;
 import java.util.*;
 
@@ -34,11 +36,19 @@ public class dataAccessGame {
         throw new DataAccessException("Error: bad request");
     }
 
-    public static void addPlayer(int gameID, String color, String username) {
-        for(GameData game: myGameData){
-            if(game.gameID == gameID){
-                if(color.equals("white")){ game.setWhiteUsername(username);}
-                if(color.equals("black")){ game.setBlackUsername(username);}
+    public static void addPlayer(GameData game, String username, String color) throws DataAccessException {
+        if(color.equals("WHITE") || color.equals("white")){
+            try{
+                game.setWhiteUsername(username);
+            } catch (DirectoryNotEmptyException e) {
+                throw new DataAccessException(e.getMessage());
+            }
+        }
+        else{
+            try{
+                game.setBlackUsername(username);
+            } catch (DirectoryNotEmptyException e) {
+                throw new DataAccessException(e.getMessage());
             }
         }
     }
