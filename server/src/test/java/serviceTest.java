@@ -1,4 +1,5 @@
 import chess.ChessGame;
+import dataAccess.DataAccessException;
 import dataAccess.dataAccessAuth;
 import dataAccess.dataAccessGame;
 import dataAccess.dataAccessUser;
@@ -108,14 +109,20 @@ public class serviceTest {
         Assertions.assertEquals(1, dataAccessUser.myUserData.size());
         Assertions.assertEquals(0, dataAccessAuth.myAuthData.size());
 
-        var atmpt1 = UserService.login(new UserData("incorrect","batmaniscool", "thebat@knight.com"));
-        Assertions.assertNull(atmpt1);
+        try{
+            var atmpt1 = UserService.login(new UserData("incorrect","batmaniscool", "thebat@knight.com"));
+            Assertions.fail("Expected to throw an error");
+        }
+        catch (DataAccessException e) {}
 
-        var atmpt2 = UserService.login(new UserData("login1","batmanisawesome", "thebat@knight.com"));
-        Assertions.assertNull(atmpt2);
+        try{
+            var atmpt2 = UserService.login(new UserData("login1","batmanisawesome", "thebat@knight.com"));
+            Assertions.fail("Expected to throw an error");
+        } catch (DataAccessException e) {}
 
-        var atmpt3 = UserService.login(new UserData("login1","batmaniscool", "thebat@knight.com"));
-        Assertions.assertNotNull(atmpt3);
+        try{
+            var atmpt3 = UserService.login(new UserData("login1","batmaniscool", "thebat@knight.com"));
+        } catch (DataAccessException e) { Assertions.fail("Got an Exception" + e); }
         ClearService.clearDataBase();
     }
 

@@ -1,5 +1,7 @@
 package server;
 
+import Handlers.UserHandlers;
+import Handlers.mainHandler;
 import spark.*;
 
 public class Server {
@@ -18,25 +20,25 @@ public class Server {
 
     private static void createRoutes() {
         //Clear application
-        Spark.delete("/db", (request, response) -> "Not yet finished");
+        Spark.delete("/db", mainHandler::clear);
 
         //Register User
-        Spark.post("/user", (request, response) -> "Not yet finished");
+        Spark.post("/user", UserHandlers::register);
 
         //Login
-        Spark.post("/session", (request, response) -> "Not yet finished");
+        Spark.post("/session", UserHandlers::login);
 
         //Logout
-        Spark.delete("/session", (request, response) -> "Not yet finished");
+        Spark.delete("/session", UserHandlers::logout);
 
         //List games
-        Spark.get("/game", (request, response) -> "Not yet finished");
+        Spark.get("/game", mainHandler::list);
 
         //Create games
-        Spark.post("/game", (request, response) -> "Not yet finished");
+        Spark.post("/game", mainHandler::create);
 
         //Join game
-        Spark.put("/game", (request, response) -> "Not yet finished");
+        Spark.put("/game", mainHandler::join);
 
     }
 

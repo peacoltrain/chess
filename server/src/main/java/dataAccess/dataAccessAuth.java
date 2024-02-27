@@ -15,7 +15,7 @@ public class dataAccessAuth {
     private dataAccessAuth() {
     }
 
-    public static void clearAuth(){
+    public static void clearAuth() {
         myAuthData.clear();
     }
 

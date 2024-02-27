@@ -22,13 +22,13 @@ public class dataAccessUser {
         myUserData.add(data);
     }
 
-    public static UserData getUser(String username) {
-        for (UserData data : myUserData) {
-            if (data.username().equals(username)) {
-                return data;
+    public static UserData getUser(UserData data) throws DataAccessException {
+        for(UserData d: myUserData){
+            if(d.username().equals(data.username())){
+                return d;
             }
         }
-        return null;
+        throw new DataAccessException("Error: unauthorized");
     }
 
     public static Collection<UserData> getAllUsers(){
