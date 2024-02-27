@@ -16,26 +16,22 @@ public class dataAccessGame {
 
     public static GameData createNewGame(String gameName){
         Random random = new Random();
-        myGameData.add(new GameData(random.nextInt(900000) + 100000, null, null, gameName, new ChessGame()));
-        for(GameData game: myGameData){
-            if(game.gameName.equals(gameName)){
-                return game;
-            }
-        }
-        return null;
+        GameData myNewGame = new GameData(random.nextInt(900000) + 100000, null, null, gameName, new ChessGame());
+        myGameData.add(myNewGame);
+        return myNewGame;
     }
 
     public static Collection<GameData> getGameList() {
         return myGameData;
     }
 
-    public static GameData getGameFromID(int gameID){
+    public static GameData getGameFromID(int gameID) throws DataAccessException {
         for(GameData game: myGameData){
             if(game.gameID == gameID){
                 return game;
             }
         }
-        return null;
+        throw new DataAccessException("Error: bad request");
     }
 
     public static void addPlayer(int gameID, String color, String username) {

@@ -32,13 +32,13 @@ public class dataAccessAuth {
         return null;
     }
 
-    public static AuthData getAuthFromToken(String token){
+    public static AuthData getAuthFromToken(String token) throws DataAccessException{
         for(AuthData data: myAuthData){
             if(data.authToken().equals(token)){
                 return data;
             }
         }
-        return null;
+        throw new DataAccessException("Error: unauthorized");
     }
 
     public static void deleteAuth(String token) throws DataAccessException {

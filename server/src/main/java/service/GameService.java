@@ -1,45 +1,51 @@
 package service;
 
+import dataAccess.DataAccessException;
 import dataAccess.dataAccessAuth;
 import dataAccess.dataAccessGame;
+import model.AuthData;
 import model.GameData;
 
+import java.nio.file.DirectoryNotEmptyException;
 import java.util.Collection;
 
 public class GameService {
 
-    public static Collection<GameData> GameListService(String authToken) {
+    public static Collection<GameData> GameListService(String authToken) throws DataAccessException {
         var exists = dataAccessAuth.getAuthFromToken(authToken);
         if(exists != null) {
             return dataAccessGame.getGameList();
         }
-        return null;
+        throw new DataAccessException("Error: unauthorized");
     }
 
-    public static GameData CreateService(String authToken, String gameName) {
+    public static GameData CreateService(String authToken, GameData gameData) throws DataAccessException {
         var exists = dataAccessAuth.getAuthFromToken(authToken);
         if(exists != null) {
-            return dataAccessGame.createNewGame(gameName);
+            return dataAccessGame.createNewGame(gameData.gameName);
         }
-        return null;
+        throw new DataAccessException("Error: unauthorized");
     }
 
-    public static void JoinService(String authToken, String color, int gameID) {
-        var exists = dataAccessGame.getGameFromID(gameID);
-        if(exists != null){
+    public static void JoinService(String authToken, String color, int gameID) throws DataAccessException {
+        AuthData authData = dataAccessAuth.getAuthFromToken(authToken); //Throws exception if authToken doesn't exist
+        GameData selectedGame = dataAccessGame.getGameFromID(gameID); //Throws exception if gameID doesn't exist
             if(color != null){
                 if(color.equals("white")){
-                    if(exists.getWhiteUsername() == null){
-                        exists.setWhiteUsername(dataAccessAuth.getAuthFromToken(authToken).username());
+                    try{
+                        selectedGame.setWhiteUsername(authData.username());
+                    } catch (DirectoryNotEmptyException e) {
+                        throw new DataAccessException(e.getMessage());
                     }
                 }
                 else{
-                    if (exists.getBlackUsername() == null) {
-                        exists.setBlackUsername((dataAccessAuth.getAuthFromToken(authToken).username()));
+                    try{
+                        selectedGame.setBlackUsername(authData.username());
+                    } catch (DirectoryNotEmptyException e) {
+                        throw new DataAccessException(e.getMessage());
                     }
                 }
             }
-        }
     }
 
 }

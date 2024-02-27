@@ -2,6 +2,9 @@ package model;
 
 import chess.ChessGame;
 
+import java.nio.file.DirectoryNotEmptyException;
+import java.util.zip.DataFormatException;
+
 public class GameData {
 
     public final int gameID;
@@ -18,17 +21,18 @@ public class GameData {
         this.game = game;
     }
 
-    public void setWhiteUsername(String username){
-        this.whiteUsername = username;
+    public void setWhiteUsername(String username) throws DirectoryNotEmptyException {
+        if(this.whiteUsername == null){
+            this.whiteUsername = username;
+            return;
+        }
+        throw new DirectoryNotEmptyException("Error: already taken");
     }
-    public void setBlackUsername(String username){
-        this.blackUsername = username;
-    }
-
-    public String getWhiteUsername(){
-        return whiteUsername;
-    }
-    public String getBlackUsername(){
-        return blackUsername;
+    public void setBlackUsername(String username) throws DirectoryNotEmptyException{
+        if(this.blackUsername == null){
+            this.blackUsername = username;
+            return;
+        }
+        throw new DirectoryNotEmptyException("Error: already taken");
     }
 }
