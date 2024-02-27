@@ -18,6 +18,7 @@ public class dataAccessUser {
     }
 
     public static UserData getUser(UserData data) throws DataAccessException {
+        //A Exception is thrown IF no user matches
         for(UserData d: myUserData){
             if(d.username().equals(data.username())){
                 return d;
