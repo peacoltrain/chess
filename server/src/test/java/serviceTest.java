@@ -1,4 +1,3 @@
-import Handlers.mainHandler;
 import chess.ChessGame;
 import dataAccess.DataAccessException;
 import dataAccess.dataAccessAuth;
@@ -30,6 +29,33 @@ public class serviceTest {
             Assertions.fail("Not supposed to throw error");
         }
 
+        Assertions.assertEquals(testSet, dataAccessUser.myUserData);
+
+        //Clear sets
+        ClearService.clearDataBase();
+    }
+
+    @Test
+    @DisplayName("Register invalid users")
+    public void registerInvalidUser() {
+        Set<UserData> testSet = new HashSet<>();
+
+        //Attempt to add incomplete user
+        try {
+            UserService.register(new UserData("username1", null, "email@email.com"));
+        } catch (DataAccessException e) {}
+        Assertions.assertEquals(testSet, dataAccessUser.myUserData);
+
+        //Add valid user
+        testSet.add(new UserData("username1","thisisnotsecure", "email@email.com"));
+        try {
+            UserService.register(new UserData("username1", "thisisnotsecure", "email@email.com"));
+        } catch (DataAccessException e) { Assertions.fail("Shouldn't throw error");}
+        Assertions.assertEquals(testSet, dataAccessUser.myUserData);
+
+        try {
+            UserService.register(new UserData("username1", "thisisnotsecure2", "email@email.com"));
+        } catch (DataAccessException e) {}
         Assertions.assertEquals(testSet, dataAccessUser.myUserData);
 
         //Clear sets

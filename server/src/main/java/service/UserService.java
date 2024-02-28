@@ -12,9 +12,11 @@ public class UserService {
         try {
             dataAccessUser.getUser(user);
         } catch (DataAccessException e) {
-            dataAccessUser.addUser(user);
-            dataAccessAuth.addAuth(new AuthData(user.username(), UUID.randomUUID().toString()));
-            return dataAccessAuth.getAuthFromUser(user.username());
+            if(user.password() != null) {
+                dataAccessUser.addUser(user);
+                dataAccessAuth.addAuth(new AuthData(user.username(), UUID.randomUUID().toString()));
+                return dataAccessAuth.getAuthFromUser(user.username());
+            }
         }
         throw new DataAccessException("Error: already taken");
     }
