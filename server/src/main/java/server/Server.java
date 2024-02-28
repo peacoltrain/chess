@@ -1,7 +1,7 @@
 package server;
 
 import Handlers.UserHandlers;
-import Handlers.mainHandler;
+import Handlers.MainHandler;
 import spark.*;
 
 public class Server {
@@ -20,7 +20,7 @@ public class Server {
 
     private static void createRoutes() {
         //Clear application
-        Spark.delete("/db", mainHandler::clear);
+        Spark.delete("/db", MainHandler::clear);
 
         //Register User
         Spark.post("/user", UserHandlers::register);
@@ -32,13 +32,13 @@ public class Server {
         Spark.delete("/session", UserHandlers::logout);
 
         //List games
-        Spark.get("/game", mainHandler::list);
+        Spark.get("/game", MainHandler::list);
 
         //Create games
-        Spark.post("/game", mainHandler::create);
+        Spark.post("/game", MainHandler::create);
 
         //Join game
-        Spark.put("/game", mainHandler::join);
+        Spark.put("/game", MainHandler::join);
 
     }
 

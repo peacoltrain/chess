@@ -1,15 +1,15 @@
 package service;
 
-import dataAccess.dataAccessAuth;
-import dataAccess.dataAccessGame;
-import dataAccess.dataAccessUser;
+import dataAccess.DataAccessAuth;
+import dataAccess.DataAccessGame;
+import dataAccess.DataAccessUser;
 
 public class ClearService {
 
     public static void clearDataBase(){
-        dataAccessUser.clearUser();
-        dataAccessAuth.clearAuth();
-        dataAccessGame.clearGameData();
+        DataAccessUser.clearUser();
+        DataAccessAuth.clearAuth();
+        DataAccessGame.clearGameData();
     }
 
 }

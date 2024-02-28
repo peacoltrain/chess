@@ -5,7 +5,7 @@ import java.nio.file.DirectoryNotEmptyException;
 import java.util.Random;
 import java.util.*;
 
-public class dataAccessGame {
+public class DataAccessGame {
 
     public static Set<GameData> myGameData = new HashSet<GameData>();
 

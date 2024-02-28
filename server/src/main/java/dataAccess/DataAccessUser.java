@@ -4,11 +4,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class dataAccessUser {
+public class DataAccessUser {
 
     public static Set<UserData> myUserData = new HashSet<>();
 
-    private dataAccessUser(){}
+    private DataAccessUser(){}
     public static void clearUser() {
         myUserData.clear();
     }

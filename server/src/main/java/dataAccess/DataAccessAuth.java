@@ -3,11 +3,11 @@ import model.AuthData;
 import java.util.HashSet;
 import java.util.Set;
 
-public class dataAccessAuth {
+public class DataAccessAuth {
 
     public static Set<AuthData> myAuthData = new HashSet<>();
 
-    private dataAccessAuth() {
+    private DataAccessAuth() {
     }
 
     public static void clearAuth() {

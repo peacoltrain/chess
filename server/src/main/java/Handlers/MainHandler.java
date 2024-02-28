@@ -13,7 +13,7 @@ import spark.Response;
 
 import java.util.Collection;
 
-public class mainHandler {
+public class MainHandler {
 
     public static String clear(Request request, Response response){
         //Call ClearService
@@ -35,7 +35,7 @@ public class mainHandler {
         //Try to get list of gameData
         try {
             //Call Service
-            Collection<GameData> returnData = GameService.GameListService(authToken);
+            Collection<GameData> returnData = GameService.gameListService(authToken);
 
             //Declare JsonArray and make Json for every needed element
             JsonArray gamesArray = new JsonArray();
@@ -71,7 +71,7 @@ public class mainHandler {
 
         try {
             //Try to create game
-            GameData returnData = GameService.CreateService(authToken, gameData);
+            GameData returnData = GameService.createService(authToken, gameData);
             jsonObject.addProperty("gameID", returnData.gameID);
             return gson.toJson(jsonObject);
         } catch (DataAccessException e) {
@@ -98,7 +98,7 @@ public class mainHandler {
         }
 
         try {
-            GameService.JoinService(authToken, playerColor, gameID);
+            GameService.joinService(authToken, playerColor, gameID);
             return "";
         } catch (DataAccessException e) {
             /*In the event an Exception is thrown, first get the message

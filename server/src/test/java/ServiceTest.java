@@ -1,8 +1,8 @@
 import chess.ChessGame;
 import dataAccess.DataAccessException;
-import dataAccess.dataAccessAuth;
-import dataAccess.dataAccessGame;
-import dataAccess.dataAccessUser;
+import dataAccess.DataAccessAuth;
+import dataAccess.DataAccessGame;
+import dataAccess.DataAccessUser;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -15,7 +15,7 @@ import service.UserService;
 
 import java.util.*;
 
-public class serviceTest {
+public class ServiceTest {
 
 
     @Test
@@ -29,7 +29,7 @@ public class serviceTest {
             Assertions.fail("Not supposed to throw error");
         }
 
-        Assertions.assertEquals(testSet, dataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
 
         //Clear sets
         ClearService.clearDataBase();
@@ -44,19 +44,19 @@ public class serviceTest {
         try {
             UserService.register(new UserData("username1", null, "email@email.com"));
         } catch (DataAccessException e) {}
-        Assertions.assertEquals(testSet, dataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
 
         //Add valid user
         testSet.add(new UserData("username1","thisisnotsecure", "email@email.com"));
         try {
             UserService.register(new UserData("username1", "thisisnotsecure", "email@email.com"));
         } catch (DataAccessException e) { Assertions.fail("Shouldn't throw error");}
-        Assertions.assertEquals(testSet, dataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
 
         try {
             UserService.register(new UserData("username1", "thisisnotsecure2", "email@email.com"));
         } catch (DataAccessException e) {}
-        Assertions.assertEquals(testSet, dataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
 
         //Clear sets
         ClearService.clearDataBase();
@@ -91,12 +91,12 @@ public class serviceTest {
             Assertions.fail("Should throw error");
         } catch (DataAccessException e) {}
 
-        Assertions.assertEquals(testSet, dataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
 
         //Clear sets
         testSet.clear();
         ClearService.clearDataBase();
-        Assertions.assertEquals(testSet, dataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
     }
 
     @Test
@@ -135,24 +135,24 @@ public class serviceTest {
         } catch (DataAccessException e) {}
 
         //Compare Users and auth
-        Assertions.assertEquals(testUserSet, dataAccessUser.myUserData);
-        Assertions.assertEquals(testAuthSet.size(), dataAccessAuth.myAuthData.size());
+        Assertions.assertEquals(testUserSet, DataAccessUser.myUserData);
+        Assertions.assertEquals(testAuthSet.size(), DataAccessAuth.myAuthData.size());
 
         //Clear sets
         testUserSet.clear();
         testAuthSet.clear();
         ClearService.clearDataBase();
-        Assertions.assertEquals(testUserSet, dataAccessUser.myUserData);
-        Assertions.assertEquals(testAuthSet, dataAccessAuth.myAuthData);
+        Assertions.assertEquals(testUserSet, DataAccessUser.myUserData);
+        Assertions.assertEquals(testAuthSet, DataAccessAuth.myAuthData);
         ClearService.clearDataBase();
     }
 
     @Test
     @DisplayName("Make on user and then log in")
     public void loginSingular() {
-        dataAccessUser.addUser(new UserData("login1","batmaniscool", "thebat@knight.com"));
-        Assertions.assertEquals(1, dataAccessUser.myUserData.size());
-        Assertions.assertEquals(0, dataAccessAuth.myAuthData.size());
+        DataAccessUser.addUser(new UserData("login1","batmaniscool", "thebat@knight.com"));
+        Assertions.assertEquals(1, DataAccessUser.myUserData.size());
+        Assertions.assertEquals(0, DataAccessAuth.myAuthData.size());
 
         try{
             var atmpt1 = UserService.login(new UserData("incorrect","batmaniscool", "thebat@knight.com"));
@@ -176,12 +176,12 @@ public class serviceTest {
     public void logout() {
         Set<AuthData> testSet = new HashSet<>();
         AuthData test = new AuthData(UUID.randomUUID().toString(), "HelloThere");
-        dataAccessAuth.addAuth(test);
-        Assertions.assertNotNull(dataAccessAuth.myAuthData);
+        DataAccessAuth.addAuth(test);
+        Assertions.assertNotNull(DataAccessAuth.myAuthData);
         try{
             UserService.logout(test.authToken());
         }catch (DataAccessException e){ Assertions.fail("Should not have thrown error");}
-        Assertions.assertEquals(testSet, dataAccessAuth.myAuthData);
+        Assertions.assertEquals(testSet, DataAccessAuth.myAuthData);
         ClearService.clearDataBase();
     }
 
@@ -195,9 +195,9 @@ public class serviceTest {
         } catch (DataAccessException e) { Assertions.fail("Should not throw error");}
         testSet.add(new GameData(12345, null, null, "Empty Game", new ChessGame()));
         try{
-            GameService.CreateService(testAuth.authToken(), new GameData(12345,null,null,"Empty Game", new ChessGame()));
+            GameService.createService(testAuth.authToken(), new GameData(12345,null,null,"Empty Game", new ChessGame()));
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
-        Assertions.assertEquals(testSet.size(), dataAccessGame.getGameList().size());
+        Assertions.assertEquals(testSet.size(), DataAccessGame.getGameList().size());
         ClearService.clearDataBase();
     }
 
@@ -215,16 +215,16 @@ public class serviceTest {
         testList.add(new GameData(45454, "Lucy", "Steve", "Full Game", new ChessGame()));
 
         try{
-            GameService.CreateService(testAuth.authToken(), new GameData(173839,null,null,"Empty Game", new ChessGame()));
+            GameService.createService(testAuth.authToken(), new GameData(173839,null,null,"Empty Game", new ChessGame()));
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
         try{
-            GameService.CreateService(testAuth.authToken(), new GameData(17283,null,null,"Half-full", new ChessGame()));
+            GameService.createService(testAuth.authToken(), new GameData(17283,null,null,"Half-full", new ChessGame()));
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
         try{
-            GameService.CreateService(testAuth.authToken(), new GameData(19485,null,null,"Full Game", new ChessGame()));
+            GameService.createService(testAuth.authToken(), new GameData(19485,null,null,"Full Game", new ChessGame()));
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
 
-        Assertions.assertEquals(testList.size(), dataAccessGame.getGameList().size());
+        Assertions.assertEquals(testList.size(), DataAccessGame.getGameList().size());
         ClearService.clearDataBase();
 
     }
@@ -244,16 +244,16 @@ public class serviceTest {
         }catch (DataAccessException e) {Assertions.fail("Shouldn't throw error");}
         GameData game = null;
         try{
-            game = GameService.CreateService(testAuth1.authToken(), new GameData(1234, null,null, "Empty", new ChessGame()));
+            game = GameService.createService(testAuth1.authToken(), new GameData(1234, null,null, "Empty", new ChessGame()));
         } catch (DataAccessException e) {Assertions.fail("Should not throw");}
         try {
-            GameService.JoinService(testAuth1.authToken(), "white", game.gameID);
+            GameService.joinService(testAuth1.authToken(), "white", game.gameID);
         } catch (DataAccessException e){Assertions.fail("Should not throw");}
         try{
-            GameService.JoinService(testAuth2.authToken(), "black", game.gameID);
+            GameService.joinService(testAuth2.authToken(), "black", game.gameID);
         } catch (DataAccessException e){Assertions.fail("Should not throw");}
         try{
-            GameService.JoinService(testAuth3.authToken(), null, game.gameID);
+            GameService.joinService(testAuth3.authToken(), null, game.gameID);
         } catch (DataAccessException e){Assertions.fail("Should not throw");}
         Assertions.assertEquals(testAuth1.username(), game.whiteUsername);
         Assertions.assertEquals(testAuth2.username(), game.blackUsername);
