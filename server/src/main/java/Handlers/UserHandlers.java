@@ -24,7 +24,6 @@ public class UserHandlers {
             return gson.toJson(jsonObject);
         }
 
-
         try{
             AuthData returnData = UserService.register(registerData);
             return gson.toJson(returnData);

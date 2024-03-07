@@ -8,7 +8,6 @@ public class DataAccessUser {
 
     public static Set<UserData> myUserData = new HashSet<>();
 
-    private DataAccessUser(){}
     public static void clearUser() {
         myUserData.clear();
     }
