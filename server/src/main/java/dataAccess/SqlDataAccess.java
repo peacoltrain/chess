@@ -10,6 +10,7 @@ import javax.xml.crypto.Data;
 import java.nio.file.DirectoryNotEmptyException;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Random;
 
@@ -48,7 +49,7 @@ public class SqlDataAccess implements DataAccess{
         }else {
             sqlStatement = "UPDATE gameTable SET `blackusername` = ? WHERE `gameID` = ?";
         }
-        execute(sqlStatement, color, game.gameID);
+        execute(sqlStatement, username, game.gameID);
     }
 
     public void addUser(UserData data) throws DataAccessException {
@@ -105,8 +106,23 @@ public class SqlDataAccess implements DataAccess{
             throw new DataAccessException("get User test message");
         }
     }
-    public Collection<GameData> getGameList() {
-        throw new RuntimeException("Not yet implemented");
+    public Collection<GameData> getGameList() throws DataAccessException{
+        Gson gson = new Gson();
+        var result = new ArrayList<GameData>();
+        try (var conn = DatabaseManager.getConnection()) {
+            String sqlStatement = "SELECT * FROM gameTable";
+            try (var preparedStatement = conn.prepareStatement(sqlStatement)) {
+                try (var returnValue = preparedStatement.executeQuery()) {
+                    while(returnValue.next()){
+                        result.add(new GameData(returnValue.getInt("gameID"),returnValue.getString("whiteUsername"),returnValue.getString("blackUsername")
+                                , returnValue.getString("gameName"), gson.fromJson(returnValue.getString("jsonGame"), ChessGame.class)));
+                    }
+                    return result;
+                }
+            }
+        }catch (SQLException e) {
+            throw new DataAccessException("get User test message");
+        }
     }
     public GameData getGameFromID(int gameID) throws DataAccessException {
         Gson gson = new Gson();

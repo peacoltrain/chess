@@ -14,7 +14,7 @@ public interface DataAccess {
     void deleteAuth(String token) throws DataAccessException;
     void clearGameData() throws DataAccessException;
     GameData createNewGame(String gameName) throws DataAccessException;
-    Collection<GameData> getGameList();
+    Collection<GameData> getGameList() throws DataAccessException;
     GameData getGameFromID(int gameID) throws DataAccessException;
     void addPlayer(GameData game, String username, String color) throws DataAccessException;
     void clearUser() throws DataAccessException;
