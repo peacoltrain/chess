@@ -17,7 +17,9 @@ public class MainHandler {
 
     public static String clear(Request request, Response response){
         //Call ClearService
-        ClearService.clearDataBase();
+        try{
+            ClearService.clearDataBase();
+        }catch(DataAccessException e){}
 
         //Set response status
         response.status(200);

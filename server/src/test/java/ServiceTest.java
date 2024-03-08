@@ -1,8 +1,5 @@
 import chess.ChessGame;
-import dataAccess.DataAccessException;
-import dataAccess.DataAccessAuth;
-import dataAccess.DataAccessGame;
-import dataAccess.DataAccessUser;
+import dataAccess.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -17,10 +14,10 @@ import java.util.*;
 
 public class ServiceTest {
 
-
+    private static DataAccess testAccess;
     @Test
     @DisplayName("Register and clear one new user")
-    public void registerNewUser() {
+    public void registerNewUser() throws DataAccessException {
         Set<UserData> testSet = new HashSet<>();
         testSet.add(new UserData("username1","thisisnotsecure", "email@email.com"));
         try {
@@ -37,7 +34,7 @@ public class ServiceTest {
 
     @Test
     @DisplayName("Register invalid users")
-    public void registerInvalidUser() {
+    public void registerInvalidUser() throws DataAccessException {
         Set<UserData> testSet = new HashSet<>();
 
         //Attempt to add incomplete user
@@ -64,7 +61,7 @@ public class ServiceTest {
 
     @Test
     @DisplayName("Register multiple users w/ duplicates")
-    public void multiRegister() {
+    public void multiRegister() throws DataAccessException {
         Set<UserData> testSet = new HashSet<>();
         //Test users
         testSet.add(new UserData("username1","thisisnotsecure", "email@email.com"));
@@ -101,7 +98,7 @@ public class ServiceTest {
 
     @Test
     @DisplayName("Register multiple users w/ duplicates and check Tokens")
-    public void multiRegisterAndAuth() {
+    public void multiRegisterAndAuth() throws DataAccessException {
         Set<UserData> testUserSet = new HashSet<>();
         Set<AuthData> testAuthSet = new HashSet<>();
         //Test users
@@ -149,7 +146,7 @@ public class ServiceTest {
 
     @Test
     @DisplayName("Make on user and then log in")
-    public void loginSingular() {
+    public void loginSingular() throws DataAccessException {
         DataAccessUser.addUser(new UserData("login1","batmaniscool", "thebat@knight.com"));
         Assertions.assertEquals(1, DataAccessUser.myUserData.size());
         Assertions.assertEquals(0, DataAccessAuth.myAuthData.size());
@@ -173,10 +170,10 @@ public class ServiceTest {
 
     @Test
     @DisplayName("Make on multiple and then log in")
-    public void logout() {
+    public void logout() throws DataAccessException {
         Set<AuthData> testSet = new HashSet<>();
-        AuthData test = new AuthData(UUID.randomUUID().toString(), "HelloThere");
-        DataAccessAuth.addAuth(test);
+        AuthData test = new AuthData("HelloThere",UUID.randomUUID().toString());
+//        DataAccessAuth.addAuth(test);
         Assertions.assertNotNull(DataAccessAuth.myAuthData);
         try{
             UserService.logout(test.authToken());
@@ -187,7 +184,7 @@ public class ServiceTest {
 
     @Test
     @DisplayName("Create a game")
-    public void createGame(){
+    public void createGame() throws DataAccessException {
         Set<GameData> testSet = new HashSet<>();
         AuthData testAuth = null;
         try {
@@ -203,7 +200,7 @@ public class ServiceTest {
 
     @Test
     @DisplayName("Get a list of games")
-    public void GameListTest() {
+    public void GameListTest() throws DataAccessException {
         List<GameData> testList = new ArrayList<>();
         AuthData testAuth = null;
         try { testAuth = UserService.register(new UserData("RandomUser", "12345678", "yahoo@gmail.com"));
@@ -231,7 +228,7 @@ public class ServiceTest {
 
     @Test
     @DisplayName("Join a game")
-    public void joinGame(){
+    public void joinGame() throws DataAccessException {
         AuthData testAuth1 = null;
         AuthData testAuth2 = null;
         AuthData testAuth3 = null;
