@@ -2,6 +2,8 @@ package service;
 import dataAccess.*;
 import model.AuthData;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 import java.util.UUID;
 
 public class UserService {
@@ -29,9 +31,10 @@ public class UserService {
         throw new DataAccessException("Error: already taken");
     }
     public static AuthData login(UserData user) throws DataAccessException {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
         String username = user.username();
         UserData exists = dataAccess.getUser(user);
-        if (exists.password().equals(user.password())) {
+        if (encoder.matches(user.password(), exists.password())) {
             AuthData returnAuth = new AuthData(username, UUID.randomUUID().toString());
             dataAccess.addAuth(returnAuth);
             return returnAuth;

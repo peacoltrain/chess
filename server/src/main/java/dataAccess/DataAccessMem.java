@@ -10,7 +10,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
-public class DataAccessAuth implements DataAccess{
+public class DataAccessMem implements DataAccess{
 
     public static Set<AuthData> myAuthData = new HashSet<>();
     public static Set<GameData> myGameData = new HashSet<GameData>();
@@ -102,4 +102,13 @@ public class DataAccessAuth implements DataAccess{
         throw new DataAccessException("Error: unauthorized");
     }
 
+    public Set<UserData> getUserSet(){
+        return myUserData;
+    }
+    public Set<AuthData> getAuthSet(){
+        return myAuthData;
+    }
+    public Set<GameData> getGameSet(){
+        return myGameData;
+    }
 }

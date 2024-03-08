@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.xml.crypto.Data;
 import java.nio.file.DirectoryNotEmptyException;
@@ -40,21 +41,26 @@ public class SqlDataAccess implements DataAccess{
         execute(sqlStatement, authData.username(), authData.authToken());
     }
     public void deleteAuth(String token) throws DataAccessException {
-        throw new RuntimeException("Not yet implemented");
+        String sqlStatement = "DELETE FROM authTable WHERE authToken = ?";
+        execute(sqlStatement, token);
     }
     public void addPlayer(GameData game, String username, String color) throws DataAccessException {
         String sqlStatement;
         if(color.equals("white") || color.equals("WHITE")) {
+            if(game.whiteUsername != null) { throw new DataAccessException("Error: already taken");}
             sqlStatement = "UPDATE gameTable SET `whiteusername` = ? WHERE `gameID` = ?";
         }else {
+            if(game.blackUsername != null) { throw new DataAccessException("Error: already taken");}
             sqlStatement = "UPDATE gameTable SET `blackusername` = ? WHERE `gameID` = ?";
         }
         execute(sqlStatement, username, game.gameID);
     }
 
     public void addUser(UserData data) throws DataAccessException {
+        BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+        String hashedPassword = encoder.encode(data.password());
         String sqlStatement = "INSERT INTO userTable (username, password, email) VALUES (?, ?, ?)";
-        execute(sqlStatement, data.username(), data.password(), data.email());
+        execute(sqlStatement, data.username(), hashedPassword, data.email());
     }
     public AuthData getAuthFromUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -135,7 +141,7 @@ public class SqlDataAccess implements DataAccess{
                         return new GameData(returnValue.getInt("gameID"),returnValue.getString("whiteUsername"),returnValue.getString("blackUsername")
                         , returnValue.getString("gameName"), gson.fromJson(returnValue.getString("jsonGame"), ChessGame.class));
                     }
-                    throw new DataAccessException("Error: unauthorized");
+                    throw new DataAccessException("Error: bad request");
                 }
             }
         } catch (SQLException e) {
@@ -172,7 +178,10 @@ public class SqlDataAccess implements DataAccess{
                     else if (par == null) preparedStatement.setNull(i + 1, NULL);
 
                 }
-                preparedStatement.executeUpdate();
+                var rc = preparedStatement.executeUpdate();
+                if(rc == 0){
+                    throw new DataAccessException("Error: unauthorized");
+                }
             }
         } catch (SQLException e){
             throw new DataAccessException("Not yet done");

@@ -1,11 +1,11 @@
+package dataAccessTests;
+
 import chess.ChessGame;
 import dataAccess.*;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import service.ClearService;
 import service.GameService;
 import service.UserService;
@@ -14,22 +14,21 @@ import java.util.*;
 
 public class ServiceTest {
 
-    private static DataAccess testAccess;
+
+
+    private DataAccessMem dao = new DataAccessMem();
+
     @Test
     @DisplayName("Register and clear one new user")
     public void registerNewUser() throws DataAccessException {
         Set<UserData> testSet = new HashSet<>();
         testSet.add(new UserData("username1","thisisnotsecure", "email@email.com"));
-        try {
-            UserService.register(new UserData("username1", "thisisnotsecure", "email@email.com"));
-        } catch (DataAccessException e) {
-            Assertions.fail("Not supposed to throw error");
-        }
-
-        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
-
+        dao.addUser(new UserData("username1", "thisisnotsecure", "email@email.com"));
+        Assertions.assertEquals(testSet, dao.getUserSet());
         //Clear sets
-        ClearService.clearDataBase();
+        dao.clearUser();
+        dao.clearGameData();
+        dao.clearAuth();
     }
 
     @Test
@@ -41,19 +40,19 @@ public class ServiceTest {
         try {
             UserService.register(new UserData("username1", null, "email@email.com"));
         } catch (DataAccessException e) {}
-        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, dao.getUserSet());
 
         //Add valid user
         testSet.add(new UserData("username1","thisisnotsecure", "email@email.com"));
         try {
             UserService.register(new UserData("username1", "thisisnotsecure", "email@email.com"));
         } catch (DataAccessException e) { Assertions.fail("Shouldn't throw error");}
-        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, dao.getUserSet());
 
         try {
             UserService.register(new UserData("username1", "thisisnotsecure2", "email@email.com"));
         } catch (DataAccessException e) {}
-        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, dao.getUserSet());
 
         //Clear sets
         ClearService.clearDataBase();
@@ -88,12 +87,12 @@ public class ServiceTest {
             Assertions.fail("Should throw error");
         } catch (DataAccessException e) {}
 
-        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, dao.getUserSet());
 
         //Clear sets
         testSet.clear();
         ClearService.clearDataBase();
-        Assertions.assertEquals(testSet, DataAccessUser.myUserData);
+        Assertions.assertEquals(testSet, dao.getUserSet());
     }
 
     @Test
@@ -132,24 +131,24 @@ public class ServiceTest {
         } catch (DataAccessException e) {}
 
         //Compare Users and auth
-        Assertions.assertEquals(testUserSet, DataAccessUser.myUserData);
-        Assertions.assertEquals(testAuthSet.size(), DataAccessAuth.myAuthData.size());
+        Assertions.assertEquals(testUserSet, dao.getUserSet());
+        Assertions.assertEquals(testAuthSet.size(), DataAccessMem.myAuthData.size());
 
         //Clear sets
         testUserSet.clear();
         testAuthSet.clear();
         ClearService.clearDataBase();
-        Assertions.assertEquals(testUserSet, DataAccessUser.myUserData);
-        Assertions.assertEquals(testAuthSet, DataAccessAuth.myAuthData);
+        Assertions.assertEquals(testUserSet, dao.getUserSet());
+        Assertions.assertEquals(testAuthSet, DataAccessMem.myAuthData);
         ClearService.clearDataBase();
     }
 
     @Test
     @DisplayName("Make on user and then log in")
     public void loginSingular() throws DataAccessException {
-        DataAccessUser.addUser(new UserData("login1","batmaniscool", "thebat@knight.com"));
-        Assertions.assertEquals(1, DataAccessUser.myUserData.size());
-        Assertions.assertEquals(0, DataAccessAuth.myAuthData.size());
+        dao.addUser(new UserData("login1","batmaniscool", "thebat@knight.com"));
+        Assertions.assertEquals(1, dao.myUserData.size());
+        Assertions.assertEquals(0, DataAccessMem.myAuthData.size());
 
         try{
             var atmpt1 = UserService.login(new UserData("incorrect","batmaniscool", "thebat@knight.com"));
@@ -174,11 +173,11 @@ public class ServiceTest {
         Set<AuthData> testSet = new HashSet<>();
         AuthData test = new AuthData("HelloThere",UUID.randomUUID().toString());
 //        DataAccessAuth.addAuth(test);
-        Assertions.assertNotNull(DataAccessAuth.myAuthData);
+        Assertions.assertNotNull(DataAccessMem.myAuthData);
         try{
             UserService.logout(test.authToken());
         }catch (DataAccessException e){ Assertions.fail("Should not have thrown error");}
-        Assertions.assertEquals(testSet, DataAccessAuth.myAuthData);
+        Assertions.assertEquals(testSet, DataAccessMem.myAuthData);
         ClearService.clearDataBase();
     }
 
@@ -194,7 +193,7 @@ public class ServiceTest {
         try{
             GameService.createService(testAuth.authToken(), new GameData(12345,null,null,"Empty Game", new ChessGame()));
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
-        Assertions.assertEquals(testSet.size(), DataAccessGame.getGameList().size());
+        Assertions.assertEquals(testSet.size(), dao.getGameList().size());
         ClearService.clearDataBase();
     }
 
@@ -221,7 +220,7 @@ public class ServiceTest {
             GameService.createService(testAuth.authToken(), new GameData(19485,null,null,"Full Game", new ChessGame()));
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
 
-        Assertions.assertEquals(testList.size(), DataAccessGame.getGameList().size());
+        Assertions.assertEquals(testList.size(), dao.getGameList().size());
         ClearService.clearDataBase();
 
     }
