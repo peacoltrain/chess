@@ -151,7 +151,7 @@ public class SqlDataAccess implements DataAccess{
                 preparedStatement.setString(1, data.username());
                 try (var returnValue = preparedStatement.executeQuery()) {
                     if (returnValue.next()) {
-                        return new UserData("test", "test", "test");
+                        return new UserData(returnValue.getString("username"), returnValue.getString("password"), returnValue.getString("email"));
                     }
                     throw new DataAccessException("Error: unauthorized");
                 }
