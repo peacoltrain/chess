@@ -8,8 +8,8 @@ import java.util.Collection;
 
 public interface DataAccess {
     void clearAuth() throws DataAccessException;
-    void addAuth(AuthData authData);
-    AuthData getAuthFromUser(String username);
+    void addAuth(AuthData authData) throws DataAccessException;
+    AuthData getAuthFromUser(String username) throws DataAccessException;
     AuthData getAuthFromToken(String token) throws DataAccessException;
     void deleteAuth(String token) throws DataAccessException;
     void clearGameData() throws DataAccessException;
@@ -18,6 +18,6 @@ public interface DataAccess {
     GameData getGameFromID(int gameID) throws DataAccessException;
     void addPlayer(GameData game, String username, String color) throws DataAccessException;
     void clearUser() throws DataAccessException;
-    void addUser(UserData data);
+    void addUser(UserData data) throws DataAccessException;
     UserData getUser(UserData data) throws DataAccessException;
 }

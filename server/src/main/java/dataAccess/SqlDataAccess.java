@@ -33,11 +33,25 @@ public class SqlDataAccess implements DataAccess{
         String sqlStatement = "DELETE FROM userTable";
         execute(sqlStatement);
     }
-    public void addAuth(AuthData authData){
-        throw new RuntimeException("Not yet implemented");
+    public void addAuth(AuthData authData) throws DataAccessException {
+        String sqlStatement = "INSERT INTO authTable (username, authToken) VALUES (?, ?)";
+        execute(sqlStatement, authData.username(), authData.authToken());
     }
-    public AuthData getAuthFromUser(String username){
-        throw new RuntimeException("Not yet implemented");
+    public AuthData getAuthFromUser(String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            String sqlStatement = "SELECT * FROM authTable WHERE username =?";
+            try (var preparedStatement = conn.prepareStatement(sqlStatement)) {
+                preparedStatement.setString(1, username);
+                try (var returnValue = preparedStatement.executeQuery()) {
+                    if (returnValue.next()) {
+                        return new AuthData(returnValue.getString("username"), returnValue.getString("authToken"));
+                    }
+                    throw new DataAccessException("Error: unauthorized");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("get User test message");
+        }
     }
     public AuthData getAuthFromToken(String token) throws DataAccessException{
         throw new RuntimeException("Not yet implemented");
@@ -58,12 +72,26 @@ public class SqlDataAccess implements DataAccess{
         throw new RuntimeException("Not yet implemented");
     }
 
-    public void addUser(UserData data) {
-        throw new RuntimeException("Not yet implemented");
+    public void addUser(UserData data) throws DataAccessException {
+        String sqlStatement = "INSERT INTO userTable (username, password, email) VALUES (?, ?, ?)";
+        execute(sqlStatement, data.username(), data.password(), data.email());
     }
 
     public UserData getUser(UserData data) throws DataAccessException {
-        throw new RuntimeException("Not yet implemented");
+        try (var conn = DatabaseManager.getConnection()) {
+            String sqlStatement = "SELECT username, password, email FROM userTable WHERE username =?";
+            try (var preparedStatement = conn.prepareStatement(sqlStatement)) {
+                preparedStatement.setString(1, data.username());
+                try (var returnValue = preparedStatement.executeQuery()) {
+                    if (returnValue.next()) {
+                        return new UserData("test", "test", "test");
+                    }
+                    throw new DataAccessException("Error: unauthorized");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("get User test message");
+        }
     }
 
 
@@ -78,8 +106,6 @@ public class SqlDataAccess implements DataAccess{
 
                 }
                 preparedStatement.executeUpdate();
-
-                var keys = preparedStatement.getGeneratedKeys();
             }
         } catch (SQLException e){
             throw new DataAccessException("Not yet done");
@@ -90,16 +116,15 @@ public class SqlDataAccess implements DataAccess{
     private final String[] creationStatements = {
             """
             CREATE TABLE IF NOT EXISTS authTable (
-            `id` INT PRIMARY KEY AUTO_INCREMENT,
             `username` varchar(256) NOT NULL,
             `authToken` varchar(256) NOT NULL)
             """,
             """
             CREATE TABLE IF NOT EXISTS userTable (
-            `id` INT PRIMARY KEY AUTO_INCREMENT,
             `username` varchar(256) NOT NULL,
             `password` varchar(256) NOT NULL,
-            `email` varchar(256) NOT NULL)
+            `email` varchar(256) NOT NULL,
+            PRIMARY KEY (username))
             """,
             """
             CREATE TABLE IF NOT EXISTS gameTable (
