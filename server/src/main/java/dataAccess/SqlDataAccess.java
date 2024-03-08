@@ -38,6 +38,23 @@ public class SqlDataAccess implements DataAccess{
         String sqlStatement = "INSERT INTO authTable (username, authToken) VALUES (?, ?)";
         execute(sqlStatement, authData.username(), authData.authToken());
     }
+    public void deleteAuth(String token) throws DataAccessException {
+        throw new RuntimeException("Not yet implemented");
+    }
+    public void addPlayer(GameData game, String username, String color) throws DataAccessException {
+        String sqlStatement;
+        if(color.equals("white") || color.equals("WHITE")) {
+            sqlStatement = "UPDATE gameTable SET `whiteusername` = ? WHERE `gameID` = ?";
+        }else {
+            sqlStatement = "UPDATE gameTable SET `blackusername` = ? WHERE `gameID` = ?";
+        }
+        execute(sqlStatement, color, game.gameID);
+    }
+
+    public void addUser(UserData data) throws DataAccessException {
+        String sqlStatement = "INSERT INTO userTable (username, password, email) VALUES (?, ?, ?)";
+        execute(sqlStatement, data.username(), data.password(), data.email());
+    }
     public AuthData getAuthFromUser(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             String sqlStatement = "SELECT * FROM authTable WHERE username =?";
@@ -70,9 +87,7 @@ public class SqlDataAccess implements DataAccess{
             throw new DataAccessException("get User test message");
         }
     }
-    public void deleteAuth(String token) throws DataAccessException {
-        throw new RuntimeException("Not yet implemented");
-    }
+
     public GameData createNewGame(String gameName) throws DataAccessException{
         Gson gson = new Gson();
         Random random = new Random();
@@ -94,16 +109,24 @@ public class SqlDataAccess implements DataAccess{
         throw new RuntimeException("Not yet implemented");
     }
     public GameData getGameFromID(int gameID) throws DataAccessException {
-        throw new RuntimeException("Not yet implemented");
-    }
-    public void addPlayer(GameData game, String username, String color) throws DataAccessException {
-        throw new RuntimeException("Not yet implemented");
+        Gson gson = new Gson();
+        try (var conn = DatabaseManager.getConnection()) {
+            String sqlStatement = "SELECT * FROM gameTable WHERE gameID =?";
+            try (var preparedStatement = conn.prepareStatement(sqlStatement)) {
+                preparedStatement.setInt(1, gameID);
+                try (var returnValue = preparedStatement.executeQuery()) {
+                    if (returnValue.next()) {
+                        return new GameData(returnValue.getInt("gameID"),returnValue.getString("whiteUsername"),returnValue.getString("blackUsername")
+                        , returnValue.getString("gameName"), gson.fromJson(returnValue.getString("jsonGame"), ChessGame.class));
+                    }
+                    throw new DataAccessException("Error: unauthorized");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("get User test message");
+        }
     }
 
-    public void addUser(UserData data) throws DataAccessException {
-        String sqlStatement = "INSERT INTO userTable (username, password, email) VALUES (?, ?, ?)";
-        execute(sqlStatement, data.username(), data.password(), data.email());
-    }
 
     public UserData getUser(UserData data) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
@@ -139,7 +162,6 @@ public class SqlDataAccess implements DataAccess{
             throw new DataAccessException("Not yet done");
         }
     }
-
 
     private final String[] creationStatements = {
             """
