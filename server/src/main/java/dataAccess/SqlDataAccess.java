@@ -1,6 +1,7 @@
 package dataAccess;
 
 import chess.ChessGame;
+import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -54,13 +55,40 @@ public class SqlDataAccess implements DataAccess{
         }
     }
     public AuthData getAuthFromToken(String token) throws DataAccessException{
-        throw new RuntimeException("Not yet implemented");
+        try (var conn = DatabaseManager.getConnection()) {
+            String sqlStatement = "SELECT * FROM authTable WHERE authToken =?";
+            try (var preparedStatement = conn.prepareStatement(sqlStatement)) {
+                preparedStatement.setString(1, token);
+                try (var returnValue = preparedStatement.executeQuery()) {
+                    if (returnValue.next()) {
+                        return new AuthData(returnValue.getString("username"), returnValue.getString("authToken"));
+                    }
+                    throw new DataAccessException("Error: unauthorized");
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("get User test message");
+        }
     }
     public void deleteAuth(String token) throws DataAccessException {
         throw new RuntimeException("Not yet implemented");
     }
-    public GameData createNewGame(String gameName){
-        throw new RuntimeException("Not yet implemented");
+    public GameData createNewGame(String gameName) throws DataAccessException{
+        Gson gson = new Gson();
+        Random random = new Random();
+        GameData myNewGame = new GameData(random.nextInt(900000) + 100000, null, null, gameName, new ChessGame());
+        try (var conn = DatabaseManager.getConnection()) {
+            String sqlStatement = "INSERT INTO gameTable (gameId, whiteusername, blackusername, gameName, jsonGame) VALUES (?, Null, Null, ?, ?)";
+            try (var preparedStatement = conn.prepareStatement(sqlStatement)) {
+                preparedStatement.setInt(1, myNewGame.gameID);
+                preparedStatement.setString(2, myNewGame.gameName);
+                preparedStatement.setString(3, gson.toJson(myNewGame.game));
+                int rows = preparedStatement.executeUpdate();
+                return myNewGame;
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException("get User test message");
+        }
     }
     public Collection<GameData> getGameList() {
         throw new RuntimeException("Not yet implemented");
