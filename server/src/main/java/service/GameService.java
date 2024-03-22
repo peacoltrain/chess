@@ -22,9 +22,9 @@ public class GameService {
         return dataAccess.getGameList();
     }
 
-    public static GameData createService(String authToken, GameData gameData) throws DataAccessException {
+    public static GameData createService(String authToken, String gameName) throws DataAccessException {
         dataAccess.getAuthFromToken(authToken);
-        return dataAccess.createNewGame(gameData.gameName);
+        return dataAccess.createNewGame(gameName);
     }
 
     public static void joinService(String authToken, String color, int gameID) throws DataAccessException {

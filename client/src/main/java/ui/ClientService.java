@@ -34,12 +34,13 @@ public class ClientService {
     }
 
     private String login(String... Params){
-        var token = server.logginUser(new UserData(Params[0],Params[1], null));
+        var token = server.loginUser(new UserData(Params[0],Params[1], null));
         authToken = token.authToken();
         return "  Logged in as " + SET_TEXT_COLOR_GREEN + token.username();
     }
 
     private String logOut(){
+        if(clientStatus == ClientStatus.USEROUT) { return help(); }
         server.logoutUser(authToken);
         authToken = null;
         return "  You logged out. Come back soon!";
@@ -47,11 +48,13 @@ public class ClientService {
     public String register(String... Params) {
         var token = server.registerNewUser(new UserData(Params[0],Params[1],Params[2]));
         authToken = token.authToken();
-        return "  Logged in as " + SET_TEXT_COLOR_GREEN + token.username();
+        return "  Registered and Logged in as " + SET_TEXT_COLOR_GREEN + token.username();
     }
 
     private String create(String... Params) {
-        return "Not yet done";
+        if(clientStatus == ClientStatus.USEROUT) { return help(); }
+        var game = server.createNew(Params[0], authToken);
+        return "  You have created a NEW game. It's ID is " + Integer.toString(game.gameID);
     }
 
     private String list() {

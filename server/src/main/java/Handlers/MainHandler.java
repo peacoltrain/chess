@@ -73,7 +73,7 @@ public class MainHandler {
 
         try {
             //Try to create game
-            GameData returnData = GameService.createService(authToken, gameData);
+            GameData returnData = GameService.createService(authToken, gameData.gameName);
             jsonObject.addProperty("gameID", returnData.gameID);
             return gson.toJson(jsonObject);
         } catch (DataAccessException e) {

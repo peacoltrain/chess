@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import model.UserData;
 import model.AuthData;
@@ -18,27 +19,32 @@ public class ServerFacade {
 
     public AuthData registerNewUser(UserData userData){
         var path = "/user";
-        return this.makeRequest("POST",path, AuthData.class, userData);
+        return this.makeRequest("POST",path, AuthData.class, userData, null);
     }
 
-    public AuthData logginUser(UserData userData){
+    public AuthData loginUser(UserData userData){
         var path = "/session";
-        return this.makeRequest("POST", path, AuthData.class, userData);
+        return this.makeRequest("POST", path, AuthData.class, userData, null);
     }
 
     public void logoutUser(String token){
-        this.makeRequest("DELETE", "/session", null, token);
+        this.makeRequest("DELETE", "/session", null, null, token);
+    }
+
+    public GameData createNew(String gameData, String token){
+        GameData tempGame = new GameData(0, null, null, "CoolGame", new ChessGame());
+        return this.makeRequest("POST", "/game", GameData.class, tempGame, token);
     }
 
 
-    private <T> T makeRequest(String method, String path, Class<T> responseClass, Object request) throws RuntimeException {
+    private <T> T makeRequest(String method, String path, Class<T> responseClass, Object request, String authentication) throws RuntimeException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setReadTimeout(5000);
             http.setRequestMethod(method);
             if(method.equals("POST")) { http.setDoOutput(true); }
-            writeBody(request, http);
+            writeBody(request, authentication ,http);
             //var outStream = http.getOutputStream();
             http.connect();
             var status = http.getResponseCode();
@@ -49,18 +55,16 @@ public class ServerFacade {
         }
     }
 
-    private static void writeBody(Object request, HttpURLConnection http) throws IOException {
-        if (request != null) {
-            if(request instanceof String ) {
-                http.setRequestProperty("Authorization", request.toString());
-            }
-            else {
-                http.addRequestProperty("Content-Type", "application/json");
-                String asJson = new Gson().toJson(request);
-                try (OutputStream outputStream = http.getOutputStream()) {
-                    byte[] input = asJson.getBytes(StandardCharsets.UTF_8);
-                    outputStream.write(input, 0, input.length);
-                }
+    private static void writeBody(Object request, String auth, HttpURLConnection http) throws IOException {
+        if(auth != null) {
+            http.setRequestProperty("Authorization", auth);
+        }
+        if(request != null){
+            http.addRequestProperty("Content-Type", "application/json");
+            String asJson = new Gson().toJson(request);
+            try (OutputStream outputStream = http.getOutputStream()) {
+                byte[] input = asJson.getBytes(StandardCharsets.UTF_8);
+                outputStream.write(input, 0, input.length);
             }
         }
     }

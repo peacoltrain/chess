@@ -1,7 +1,9 @@
 package clientTests;
 
+import chess.ChessGame;
 import dataAccess.SqlDataAccess;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -82,7 +84,7 @@ public class ServerFacadeTests {
     public void loginPass() {
         AuthData authData = facade.registerNewUser(new UserData("Calvin", "asdfef", "zMan@yourMom"));
         facade.logoutUser(authData.authToken());
-        AuthData authData2 = facade.logginUser(new UserData("Calvin","asdfef", null));
+        AuthData authData2 = facade.loginUser(new UserData("Calvin","asdfef", null));
         if(authData2 != authData) {
             Assertions.assertTrue(true);
         }
@@ -95,7 +97,7 @@ public class ServerFacadeTests {
         try {
             AuthData authData = facade.registerNewUser(new UserData("Kal", "asdfef", "zMan@yourMom"));
             facade.logoutUser(authData.authToken());
-            AuthData authData2 = facade.logginUser(new UserData("Cal", "asdfef", null));
+            AuthData authData2 = facade.loginUser(new UserData("Cal", "asdfef", null));
             Assertions.fail("Should throw exception");
         }catch (Exception e){
             Assertions.assertTrue(true);
@@ -108,9 +110,28 @@ public class ServerFacadeTests {
         try {
             AuthData authData = facade.registerNewUser(new UserData("Pedro", "asdfef", "zMan@yourMom"));
             facade.logoutUser(authData.authToken());
-            AuthData authData2 = facade.logginUser(new UserData("Pedro", "asef", null));
+            AuthData authData2 = facade.loginUser(new UserData("Pedro", "asef", null));
             Assertions.fail("Should throw exception");
         } catch (Exception e) {
+            Assertions.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void createPass() {
+        AuthData authData = facade.registerNewUser(new UserData("Karen", "asdfef", "kxkx"));
+        facade.createNew("CoolGame", authData.authToken());
+        Assertions.assertTrue(true);
+    }
+
+    @Test
+    @DisplayName("Invalid Token")
+    public void createFail() {
+        try {
+            AuthData authData = facade.registerNewUser(new UserData("Ross", "asdfef", "kxkx"));
+            facade.createNew("CoolGame", "tehanoi172393");
+            Assertions.fail("It should have thrown an error");
+        }catch (Exception e) {
             Assertions.assertTrue(true);
         }
     }

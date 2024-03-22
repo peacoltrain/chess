@@ -191,7 +191,7 @@ public class ServiceTest {
         } catch (DataAccessException e) { Assertions.fail("Should not throw error");}
         testSet.add(new GameData(12345, null, null, "Empty Game", new ChessGame()));
         try{
-            GameService.createService(testAuth.authToken(), new GameData(12345,null,null,"Empty Game", new ChessGame()));
+            GameService.createService(testAuth.authToken(),"Empty Game");
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
         Assertions.assertEquals(testSet.size(), dao.getGameList().size());
         ClearService.clearDataBase();
@@ -211,13 +211,13 @@ public class ServiceTest {
         testList.add(new GameData(45454, "Lucy", "Steve", "Full Game", new ChessGame()));
 
         try{
-            GameService.createService(testAuth.authToken(), new GameData(173839,null,null,"Empty Game", new ChessGame()));
+            GameService.createService(testAuth.authToken(), "Empty Game");
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
         try{
-            GameService.createService(testAuth.authToken(), new GameData(17283,null,null,"Half-full", new ChessGame()));
+            GameService.createService(testAuth.authToken(), "Half-full");
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
         try{
-            GameService.createService(testAuth.authToken(), new GameData(19485,null,null,"Full Game", new ChessGame()));
+            GameService.createService(testAuth.authToken(), "Full Game");
         }catch(DataAccessException e){ Assertions.fail("Shouldn't throw error.");}
 
         Assertions.assertEquals(testList.size(), dao.getGameList().size());
@@ -240,7 +240,7 @@ public class ServiceTest {
         }catch (DataAccessException e) {Assertions.fail("Shouldn't throw error");}
         GameData game = null;
         try{
-            game = GameService.createService(testAuth1.authToken(), new GameData(1234, null,null, "Empty", new ChessGame()));
+            game = GameService.createService(testAuth1.authToken(), "Empty");
         } catch (DataAccessException e) {Assertions.fail("Should not throw");}
         try {
             GameService.joinService(testAuth1.authToken(), "white", game.gameID);
