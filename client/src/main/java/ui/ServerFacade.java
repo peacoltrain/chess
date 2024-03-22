@@ -32,8 +32,8 @@ public class ServerFacade {
         this.makeRequest("DELETE", "/session", null, null, token);
     }
 
-    public GameData createNew(String gameData, String token){
-        GameData tempGame = new GameData(0, null, null, "CoolGame", new ChessGame());
+    public GameData createNew(String gameName, String token){
+        GameData tempGame = new GameData(0, null, null, gameName, new ChessGame());
         return this.makeRequest("POST", "/game", GameData.class, tempGame, token);
     }
 

@@ -1,22 +1,25 @@
 package ui;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import model.GameData;
 import model.UserData;
 
 import java.util.Arrays;
+import java.util.List;
+
 import static ui.EscapeSequences.*;
 
 
 public class ClientService {
-    private final String serverUrl;
     private final ServerFacade server;
     private String authToken;
     public ClientStatus clientStatus = ClientStatus.USEROUT;
 
     public ClientService(String serverUrl) {
         server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
     }
     public String read(String inputString){
         var parse = inputString.toLowerCase().split(" ");
@@ -36,8 +39,10 @@ public class ClientService {
     }
 
     private String login(String... Params){
+        if(clientStatus == ClientStatus.USERIN) { return help(); }
         var token = server.loginUser(new UserData(Params[0],Params[1], null));
         authToken = token.authToken();
+        clientStatus = ClientStatus.USERIN;
         return "  Logged in as " + SET_TEXT_COLOR_GREEN + token.username();
     }
 
@@ -45,11 +50,14 @@ public class ClientService {
         if(clientStatus == ClientStatus.USEROUT) { return help(); }
         server.logoutUser(authToken);
         authToken = null;
+        clientStatus = ClientStatus.USEROUT;
         return "  You logged out. Come back soon!";
     }
     public String register(String... Params) {
+        if(clientStatus == ClientStatus.USERIN) { return help(); }
         var token = server.registerNewUser(new UserData(Params[0],Params[1],Params[2]));
         authToken = token.authToken();
+        clientStatus = ClientStatus.USERIN;
         return "  Registered and Logged in as " + SET_TEXT_COLOR_GREEN + token.username();
     }
 
@@ -62,7 +70,8 @@ public class ClientService {
     private String list() {
         if(clientStatus == ClientStatus.USEROUT) { return help(); }
         JsonObject list = server.list(authToken);
-        return "Not yet done";
+        JsonElement jsonArray = list.get("games");
+        return printList(jsonArray);
     }
 
     private String join(String... Params) {
@@ -76,6 +85,30 @@ public class ClientService {
         server.joinGame(authToken, Params);
         return "Not yet done";
     }
+
+    private String printList(JsonElement jsonArray) {
+        if (jsonArray != null && jsonArray.isJsonArray()) {
+            JsonArray gamesArray = jsonArray.getAsJsonArray();
+
+            // Process each game in the array
+            StringBuilder result = new StringBuilder();
+            int count = 1;
+            for (JsonElement gameElement : gamesArray) {
+                GameData gameData = new Gson().fromJson(gameElement, GameData.class);
+
+                result.append("  ").append(count).append("  ");
+                result.append(SET_TEXT_COLOR_RED).append(gameData.gameID).append("  ").append(SET_TEXT_COLOR_WHITE);
+                result.append("White Player: ").append((gameData.whiteUsername == null) ? "<empty>" : gameData.whiteUsername).append("  ").append(SET_TEXT_COLOR_BLACK);
+                result.append("Black Player: ").append((gameData.blackUsername == null) ? "<empty>" : gameData.blackUsername).append("  ").append(SET_TEXT_COLOR_BLUE);
+                result.append("Game Name: ").append(gameData.gameName).append("\n");
+                ++count;
+            }
+            return result.toString();
+        }
+        return "  No games to show.";
+    }
+
+
 
     private String help() {
         if(clientStatus == ClientStatus.USEROUT){

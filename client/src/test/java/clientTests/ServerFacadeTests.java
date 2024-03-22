@@ -1,16 +1,12 @@
 package clientTests;
 
-import chess.ChessGame;
 import com.google.gson.JsonObject;
-import dataAccess.SqlDataAccess;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
 import service.ClearService;
-import ui.ClientService;
-import ui.ClientUI;
 import ui.ServerFacade;
 
 
