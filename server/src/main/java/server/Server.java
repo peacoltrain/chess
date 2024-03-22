@@ -46,4 +46,8 @@ public class Server {
         Spark.stop();
         Spark.awaitStop();
     }
+
+    public int port() {
+        return Spark.port();
+    }
 }
