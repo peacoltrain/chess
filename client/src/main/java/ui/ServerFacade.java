@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import model.UserData;
 import model.AuthData;
 import model.GameData;
@@ -36,6 +37,17 @@ public class ServerFacade {
         return this.makeRequest("POST", "/game", GameData.class, tempGame, token);
     }
 
+    public JsonObject list(String token){
+        return this.makeRequest("GET", "/game", JsonObject.class, null, token);
+    }
+
+    public void joinGame(String authToken, String... Params){
+        JsonObject jsonRequest = new JsonObject();
+        jsonRequest.addProperty("playerColor", Params[1]);
+        jsonRequest.addProperty("gameID", Integer.parseInt(Params[0]));
+        this.makeRequest("PUT", "/game", null, jsonRequest, authToken);
+    }
+
 
     private <T> T makeRequest(String method, String path, Class<T> responseClass, Object request, String authentication) throws RuntimeException {
         try {
@@ -58,6 +70,16 @@ public class ServerFacade {
     private static void writeBody(Object request, String auth, HttpURLConnection http) throws IOException {
         if(auth != null) {
             http.setRequestProperty("Authorization", auth);
+        }
+        if(request instanceof JsonObject){
+            String jsonString = request.toString();
+            http.setDoOutput(true);
+            http.setRequestProperty("Content-Type", "application/json");
+            try (OutputStream outputStream = http.getOutputStream()) {
+                byte[] input = jsonString.getBytes(StandardCharsets.UTF_8);
+                outputStream.write(input, 0, input.length);
+            }
+            return;
         }
         if(request != null){
             http.addRequestProperty("Content-Type", "application/json");

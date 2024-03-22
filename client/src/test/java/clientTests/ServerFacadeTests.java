@@ -1,6 +1,7 @@
 package clientTests;
 
 import chess.ChessGame;
+import com.google.gson.JsonObject;
 import dataAccess.SqlDataAccess;
 import model.AuthData;
 import model.GameData;
@@ -134,5 +135,49 @@ public class ServerFacadeTests {
         }catch (Exception e) {
             Assertions.assertTrue(true);
         }
+    }
+    @Test
+    public void listPass() {
+        AuthData authData = facade.registerNewUser(new UserData("Rachel", "asdfef", "kxkx"));
+        facade.createNew("RGame", authData.authToken());
+        JsonObject list = facade.list(authData.authToken());
+        Assertions.assertTrue(true);
+    }
+
+    @Test
+    @DisplayName("Invalid Token")
+    public void listFail() {
+        try {
+            AuthData authData = facade.registerNewUser(new UserData("Roy", "asdfef", "kxkx"));
+            facade.createNew("BobsYourUncle", "tehanoi172393");
+            Assertions.fail("It should have thrown an error");
+        }catch (Exception e) {
+            Assertions.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void joinPass() {
+        AuthData authData = facade.registerNewUser(new UserData("Jack", "asdfef", "kxkx"));
+        GameData myGame = facade.createNew("JGame", authData.authToken());
+        facade.joinGame(authData.authToken(), Integer.toString(myGame.gameID), "white" );
+        Assertions.assertTrue(true);
+    }
+
+    @Test
+    @DisplayName("Trying to join an already taken color")
+    public void joinFail() {
+        AuthData authData = facade.registerNewUser(new UserData("Jan", "asdfef", "kxkx"));
+        AuthData authData2 = facade.registerNewUser(new UserData("Wade", "asdfawe", "wefsd"));
+        GameData myGame = facade.createNew("DunGame", authData.authToken());
+        facade.joinGame(authData.authToken(), Integer.toString(myGame.gameID), "white" );
+        try {
+            facade.joinGame(authData2.authToken(), Integer.toString(myGame.gameID), "white");
+            Assertions.fail("Should have thrown error");
+        }catch(Exception e){
+            Assertions.assertTrue(true);
+        }
+
+        Assertions.assertTrue(true);
     }
 }

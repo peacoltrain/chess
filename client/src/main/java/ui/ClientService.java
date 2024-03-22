@@ -1,5 +1,7 @@
 package ui;
 
+import com.google.gson.JsonObject;
+import model.GameData;
 import model.UserData;
 
 import java.util.Arrays;
@@ -58,14 +60,20 @@ public class ClientService {
     }
 
     private String list() {
+        if(clientStatus == ClientStatus.USEROUT) { return help(); }
+        JsonObject list = server.list(authToken);
         return "Not yet done";
     }
 
     private String join(String... Params) {
+        if(clientStatus == ClientStatus.USEROUT) { return help(); }
+        server.joinGame(authToken, Params[0], Params[1]);
         return "Not yet done";
     }
 
     private String observe(String... Params) {
+        if(clientStatus == ClientStatus.USEROUT) { return help(); }
+        server.joinGame(authToken, Params[0], Params[2]);
         return "Not yet done";
     }
 
