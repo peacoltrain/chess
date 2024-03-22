@@ -54,7 +54,7 @@ public class ServerFacadeTests {
     @DisplayName("registerFail by incomplete info")
     public void registerFail2() {
         try {
-            facade.registerNewUser(new UserData("OGjack", null, "yo@yo"));
+            facade.registerNewUser(new UserData("Jeff", null, "yo@yo"));
             Assertions.fail("Should have throw an exception");
         } catch (Exception e){
             Assertions.assertTrue(true);
@@ -63,6 +63,19 @@ public class ServerFacadeTests {
     @Test
     public void logoutPass() {
         AuthData authData = facade.registerNewUser(new UserData("Zac", "asdfef", "zMan@yourMom"));
+        facade.logoutUser(authData.authToken());
         Assertions.assertTrue(true);
+    }
+
+    @Test
+    @DisplayName("logout with bad authToken")
+    public void logoutFail() {
+        try {
+            facade.registerNewUser(new UserData("Ann", "asdf", "aaaabbbb"));
+            facade.logoutUser("This is a corrupt token");
+            Assertions.fail("It should have thrown an exception");
+        } catch (Exception e) {
+            Assertions.assertTrue(true);
+        }
     }
 }

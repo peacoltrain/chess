@@ -39,7 +39,7 @@ public class ServerFacade {
             http.setRequestMethod(method);
             if(method.equals("POST")) { http.setDoOutput(true); }
             writeBody(request, http);
-            var outStream = http.getOutputStream();
+            //var outStream = http.getOutputStream();
             http.connect();
             var status = http.getResponseCode();
             if(status != 200) { throw new IOException(); }
