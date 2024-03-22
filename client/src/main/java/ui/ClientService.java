@@ -1,9 +1,7 @@
 package ui;
 
-import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
-import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -13,7 +11,6 @@ import model.UserData;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import static ui.EscapeSequences.*;
@@ -24,7 +21,7 @@ public class ClientService {
     private String authToken;
     public ClientStatus clientStatus = ClientStatus.USEROUT;
     Map<Integer, Integer> intMap = new HashMap<>();
-    private ChessPiece[][] testPieceMatrix = new ChessPiece[8][8];
+    private final ChessPiece[][] testPieceMatrix = new ChessPiece[8][8];
 
     public ClientService(String serverUrl) {
         server = new ServerFacade(serverUrl);
@@ -49,10 +46,12 @@ public class ClientService {
 
     private String login(String... Params){
         if(clientStatus == ClientStatus.USERIN) { return help(); }
-        var token = server.loginUser(new UserData(Params[0],Params[1], null));
-        authToken = token.authToken();
-        clientStatus = ClientStatus.USERIN;
-        return "  Logged in as " + SET_TEXT_COLOR_GREEN + token.username();
+        try {
+            var token = server.loginUser(new UserData(Params[0], Params[1], null));
+            authToken = token.authToken();
+            clientStatus = ClientStatus.USERIN;
+            return "  Logged in as " + SET_TEXT_COLOR_GREEN + token.username();
+        } catch(Exception e){return "invalid login";}
     }
 
     private String logOut(){
@@ -64,10 +63,12 @@ public class ClientService {
     }
     public String register(String... Params) {
         if(clientStatus == ClientStatus.USERIN) { return help(); }
-        var token = server.registerNewUser(new UserData(Params[0],Params[1],Params[2]));
-        authToken = token.authToken();
-        clientStatus = ClientStatus.USERIN;
-        return "  Registered and Logged in as " + SET_TEXT_COLOR_GREEN + token.username();
+        try{
+            var token = server.registerNewUser(new UserData(Params[0],Params[1],Params[2]));
+            authToken = token.authToken();
+            clientStatus = ClientStatus.USERIN;
+            return "  Registered and Logged in as " + SET_TEXT_COLOR_GREEN + token.username();
+        }catch (Exception e) {return "Invalid parameters";}
     }
 
     private String create(String... Params) {
