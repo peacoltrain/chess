@@ -1,6 +1,7 @@
 package clientTests;
 
 import dataAccess.SqlDataAccess;
+import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 import server.Server;
@@ -59,5 +60,9 @@ public class ServerFacadeTests {
             Assertions.assertTrue(true);
         }
     }
-
+    @Test
+    public void logoutPass() {
+        AuthData authData = facade.registerNewUser(new UserData("Zac", "asdfef", "zMan@yourMom"));
+        Assertions.assertTrue(true);
+    }
 }

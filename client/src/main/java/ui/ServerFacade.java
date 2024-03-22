@@ -16,9 +16,18 @@ public class ServerFacade {
         serverUrl = url;
     }
 
-    public void registerNewUser(UserData userData){
+    public AuthData registerNewUser(UserData userData){
         var path = "/user";
-        this.makeRequest("POST",path, AuthData.class, userData);
+        return this.makeRequest("POST",path, AuthData.class, userData);
+    }
+
+    public AuthData logginUser(UserData userData){
+        var path = "/session";
+        return this.makeRequest("POST", path, AuthData.class, userData);
+    }
+
+    public void logoutUser(String token){
+        this.makeRequest("DELETE", "/session", null, token);
     }
 
 
@@ -29,7 +38,6 @@ public class ServerFacade {
             http.setReadTimeout(5000);
             http.setRequestMethod(method);
             if(method.equals("POST")) { http.setDoOutput(true); }
-
             writeBody(request, http);
             var outStream = http.getOutputStream();
             http.connect();
@@ -43,11 +51,16 @@ public class ServerFacade {
 
     private static void writeBody(Object request, HttpURLConnection http) throws IOException {
         if (request != null) {
-            http.addRequestProperty("Content-Type", "application/json");
-            String asJson = new Gson().toJson(request);
-            try (OutputStream outputStream = http.getOutputStream()) {
-                byte[] input = asJson.getBytes(StandardCharsets.UTF_8);
-                outputStream.write(input, 0, input.length);
+            if(request instanceof String ) {
+                http.setRequestProperty("Authorization", request.toString());
+            }
+            else {
+                http.addRequestProperty("Content-Type", "application/json");
+                String asJson = new Gson().toJson(request);
+                try (OutputStream outputStream = http.getOutputStream()) {
+                    byte[] input = asJson.getBytes(StandardCharsets.UTF_8);
+                    outputStream.write(input, 0, input.length);
+                }
             }
         }
     }
