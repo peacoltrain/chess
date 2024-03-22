@@ -1,5 +1,9 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -8,7 +12,9 @@ import model.GameData;
 import model.UserData;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static ui.EscapeSequences.*;
 
@@ -17,9 +23,12 @@ public class ClientService {
     private final ServerFacade server;
     private String authToken;
     public ClientStatus clientStatus = ClientStatus.USEROUT;
+    Map<Integer, Integer> intMap = new HashMap<>();
+    private ChessPiece[][] testPieceMatrix = new ChessPiece[8][8];
 
     public ClientService(String serverUrl) {
         server = new ServerFacade(serverUrl);
+        setMatrix();
     }
     public String read(String inputString){
         var parse = inputString.toLowerCase().split(" ");
@@ -76,14 +85,22 @@ public class ClientService {
 
     private String join(String... Params) {
         if(clientStatus == ClientStatus.USEROUT) { return help(); }
-        server.joinGame(authToken, Params[0], Params[1]);
-        return "Not yet done";
+        try{
+            list();
+            int par = Integer.parseInt(Params[0]);
+            server.joinGame(authToken, Integer.toString(intMap.get(par)), Params[1]);
+        }catch (Exception e){ return "Failed to join game";}
+        return printBoard();
     }
 
     private String observe(String... Params) {
         if(clientStatus == ClientStatus.USEROUT) { return help(); }
-        server.joinGame(authToken, Params);
-        return "Not yet done";
+        try {
+            list();
+            int par = Integer.parseInt(Params[0]);
+            server.joinGame(authToken, Integer.toString(intMap.get(par)));
+        }catch(Exception e){ return "Failed to join game";}
+        return printBoard();
     }
 
     private String printList(JsonElement jsonArray) {
@@ -95,7 +112,7 @@ public class ClientService {
             int count = 1;
             for (JsonElement gameElement : gamesArray) {
                 GameData gameData = new Gson().fromJson(gameElement, GameData.class);
-
+                intMap.put(count, gameData.gameID);
                 result.append("  ").append(count).append("  ");
                 result.append(SET_TEXT_COLOR_RED).append(gameData.gameID).append("  ").append(SET_TEXT_COLOR_WHITE);
                 result.append("White Player: ").append((gameData.whiteUsername == null) ? "<empty>" : gameData.whiteUsername).append("  ").append(SET_TEXT_COLOR_BLACK);
@@ -108,7 +125,105 @@ public class ClientService {
         return "  No games to show.";
     }
 
+    private void setMatrix(){
+        //Populate Pawns;
+        for(int i = 0; i < 8; ++i){
+            testPieceMatrix[6][i] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.PAWN);
+            testPieceMatrix[1][i] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.PAWN);
+        }
 
+        testPieceMatrix[7][0] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+        testPieceMatrix[7][1] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        testPieceMatrix[7][2] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        testPieceMatrix[7][3] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);
+        testPieceMatrix[7][4] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KING);
+        testPieceMatrix[7][5] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
+        testPieceMatrix[7][6] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
+        testPieceMatrix[7][7] = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
+
+        testPieceMatrix[0][0] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+        testPieceMatrix[0][1] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        testPieceMatrix[0][2] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        testPieceMatrix[0][3] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
+        testPieceMatrix[0][4] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KING);
+        testPieceMatrix[0][5] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
+        testPieceMatrix[0][6] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
+        testPieceMatrix[0][7] = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
+    }
+
+    private String printBoard(){
+        String[] charsF = {"a","b","c","d","e","f","g","h"};
+        String[] charsB = {"h","g","f","e","d","c","b","a"};
+        StringBuilder result = new StringBuilder();
+
+        //Regular
+        result.append(EMPTY);
+        for(String c: charsF){
+            result.append(EMPTY).append(c).append(" ");
+        }
+        result.append("\n");
+        for(int i = 7; i >= 0; --i){
+            result.append("   ").append(i+1).append(" ");
+            for(int j = 0; j <= 7; ++j){
+                if((i + j) % 2 != 0){result.append("\u001b[48;5;222m");}
+                if((i + j) % 2 == 0){result.append("\u001b[48;5;95m");}
+                result.append(" ").append(convertPieceToString(testPieceMatrix[i][j])).append(" ");
+            }
+            result.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLUE).append(" ").append(i+1).append(" \n");
+        }
+        result.append(EMPTY);
+        for(String c: charsF){
+            result.append(EMPTY).append(c).append(" ");
+        }
+        result.append("\n\n");
+
+        //Backward
+        result.append(EMPTY);
+        for(String c: charsB){
+            result.append(EMPTY).append(c).append(" ");
+        }
+        result.append("\n");
+        for(int i = 0; i <= 7; ++i){
+            result.append("   ").append(i+1).append(" ");
+            for(int j = 7; j >= 0; --j){
+                if((i + j) % 2 != 0){result.append("\u001b[48;5;222m");}
+                if((i + j) % 2 == 0){result.append("\u001b[48;5;95m");}
+                result.append(" ").append(convertPieceToString(testPieceMatrix[i][j])).append(" ");
+            }
+            result.append(RESET_BG_COLOR).append(SET_TEXT_COLOR_BLUE).append(" ").append(i+1).append(" \n");
+        }
+        result.append(EMPTY);
+        for(String c: charsB){
+            result.append(EMPTY).append(c).append(" ");
+        }
+        result.append("\n");
+
+        return result.toString();
+    }
+
+    private String convertPieceToString(ChessPiece piece){
+        if(piece == null){ return EMPTY; }
+        else if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            return switch (piece.getPieceType()){
+                case PAWN -> SET_TEXT_COLOR_WHITE + WHITE_PAWN;
+                case KING -> SET_TEXT_COLOR_WHITE + WHITE_KING;
+                case QUEEN -> SET_TEXT_COLOR_WHITE + WHITE_QUEEN;
+                case KNIGHT -> SET_TEXT_COLOR_WHITE + WHITE_KNIGHT;
+                case ROOK -> SET_TEXT_COLOR_WHITE + WHITE_ROOK;
+                case BISHOP -> SET_TEXT_COLOR_WHITE + WHITE_BISHOP;
+            };
+        }
+        else {
+            return switch (piece.getPieceType()){
+                case PAWN -> SET_TEXT_COLOR_BLACK + BLACK_PAWN;
+                case KING -> SET_TEXT_COLOR_BLACK + BLACK_KING;
+                case QUEEN -> SET_TEXT_COLOR_BLACK + BLACK_QUEEN;
+                case KNIGHT -> SET_TEXT_COLOR_BLACK + BLACK_KNIGHT;
+                case ROOK -> SET_TEXT_COLOR_BLACK + BLACK_ROOK;
+                case BISHOP -> SET_TEXT_COLOR_BLACK + BLACK_BISHOP;
+            };
+        }
+    }
 
     private String help() {
         if(clientStatus == ClientStatus.USEROUT){
