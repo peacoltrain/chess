@@ -180,4 +180,25 @@ public class ServerFacadeTests {
 
         Assertions.assertTrue(true);
     }
+
+    @Test
+    public void observePass() {
+        AuthData authData = facade.registerNewUser(new UserData("Mack", "asdfef", "kxkx"));
+        GameData myGame = facade.createNew("MGame", authData.authToken());
+        facade.joinGame(authData.authToken(), Integer.toString(myGame.gameID));
+        Assertions.assertTrue(true);
+    }
+
+    @Test
+    @DisplayName("Invalid gameID")
+    public void observeFail() {
+        AuthData authData = facade.registerNewUser(new UserData("Doc", "asdfef", "kxkx"));
+        GameData myGame = facade.createNew("dGame", authData.authToken());
+        try{
+            facade.joinGame(authData.authToken(), "1283849576");
+            Assertions.fail("It should throw an error");
+        }catch (Exception e){
+            Assertions.assertTrue(true);
+        }
+    }
 }

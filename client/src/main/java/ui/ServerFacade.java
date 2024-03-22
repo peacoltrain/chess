@@ -43,7 +43,7 @@ public class ServerFacade {
 
     public void joinGame(String authToken, String... Params){
         JsonObject jsonRequest = new JsonObject();
-        jsonRequest.addProperty("playerColor", Params[1]);
+        if(Params.length == 2) {jsonRequest.addProperty("playerColor", Params[1]);}
         jsonRequest.addProperty("gameID", Integer.parseInt(Params[0]));
         this.makeRequest("PUT", "/game", null, jsonRequest, authToken);
     }

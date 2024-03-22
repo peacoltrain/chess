@@ -73,7 +73,7 @@ public class ClientService {
 
     private String observe(String... Params) {
         if(clientStatus == ClientStatus.USEROUT) { return help(); }
-        server.joinGame(authToken, Params[0], Params[2]);
+        server.joinGame(authToken, Params);
         return "Not yet done";
     }
 
