@@ -78,4 +78,40 @@ public class ServerFacadeTests {
             Assertions.assertTrue(true);
         }
     }
+    @Test
+    public void loginPass() {
+        AuthData authData = facade.registerNewUser(new UserData("Calvin", "asdfef", "zMan@yourMom"));
+        facade.logoutUser(authData.authToken());
+        AuthData authData2 = facade.logginUser(new UserData("Calvin","asdfef", null));
+        if(authData2 != authData) {
+            Assertions.assertTrue(true);
+        }
+
+    }
+
+    @Test
+    @DisplayName("Login with incorrect username")
+    public void loginFail1() {
+        try {
+            AuthData authData = facade.registerNewUser(new UserData("Kal", "asdfef", "zMan@yourMom"));
+            facade.logoutUser(authData.authToken());
+            AuthData authData2 = facade.logginUser(new UserData("Cal", "asdfef", null));
+            Assertions.fail("Should throw exception");
+        }catch (Exception e){
+            Assertions.assertTrue(true);
+        }
+    }
+
+    @Test
+    @DisplayName("Login with incorrect password")
+    public void loginFail2() {
+        try {
+            AuthData authData = facade.registerNewUser(new UserData("Pedro", "asdfef", "zMan@yourMom"));
+            facade.logoutUser(authData.authToken());
+            AuthData authData2 = facade.logginUser(new UserData("Pedro", "asef", null));
+            Assertions.fail("Should throw exception");
+        } catch (Exception e) {
+            Assertions.assertTrue(true);
+        }
+    }
 }

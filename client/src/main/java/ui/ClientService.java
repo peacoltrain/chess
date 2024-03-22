@@ -41,6 +41,7 @@ public class ClientService {
 
     private String logOut(){
         server.logoutUser(authToken);
+        authToken = null;
         return "  You logged out. Come back soon!";
     }
     public String register(String... Params) {
